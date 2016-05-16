@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2015-2016 Emanuel Moecklin
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<resources>
+
+    <!-- LIGHT Theme -->
+    <style name="ContactPicker_Theme_Light" parent="@style/Theme.AppCompat.Light">
+        <item name="textColorPrimary">@color/text_color_primary_light</item>
+        <item name="textColorSecondary">@color/text_color_secondary_light</item>
+
+        <item name="contactBadgeLineColor">@color/contact_badge_line_light</item>
+        <item name="contactBadgeTriangleColor">@color/contact_badge_triangle_light</item>
+        <item name="contactBadgeOverlayColor">@color/contact_badge_overlay_light</item>
+
+        <item name="contactBadge_icMenuOK">@drawable/ic_check_black_36dp</item>
+        <item name="contactBadge_icMenuCancel">@drawable/ic_close_black_36dp</item>
+        <item name="contactBadge_icMenuCheckAll">@drawable/ic_apps_black_36dp</item>
+        <item name="contactBadge_icMenuSearch">@drawable/ic_search_black_36dp</item>
+
+    </style>
+
+    <!-- DARK Theme -->
+    <style name="ContactPicker_Theme_Dark" parent="@style/Theme.AppCompat">
+        <item name="textColorPrimary">@color/text_color_primary_dark</item>
+        <item name="textColorSecondary">@color/text_color_secondary_dark</item>
+
+        <item name="contactBadgeLineColor">@color/contact_badge_line_dark</item>
+        <item name="contactBadgeTriangleColor">@color/contact_badge_triangle_dark</item>
+        <item name="contactBadgeOverlayColor">@color/contact_badge_overlay_dark</item>
+
+        <item name="contactBadge_icMenuOK">@drawable/ic_check_white_36dp</item>
+        <item name="contactBadge_icMenuCancel">@drawable/ic_close_white_36dp</item>
+        <item name="contactBadge_icMenuCheckAll">@drawable/ic_apps_white_36dp</item>
+        <item name="contactBadge_icMenuSearch">@drawable/ic_search_white_36dp</item>
+    </style>
+
+</resources>
