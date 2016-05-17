@@ -30,6 +30,7 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 
 public class ContactViewHolder extends RecyclerView.ViewHolder {
 
+    private View mRoot;
     private TextView mName;
     private TextView mDescription;
     private ContactBadge mBadge;
@@ -42,6 +43,7 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
     ContactViewHolder(View root, ContactPictureManager contactPictureLoader) {
         super(root);
 
+        mRoot = root;
         mName = (TextView) root.findViewById(R.id.name);
         mDescription = (TextView) root.findViewById(R.id.description);
         mBadge = (ContactBadge) root.findViewById(R.id.contact_badge);
@@ -53,6 +55,13 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
     }
 
     void bind(final Contact contact) {
+        mRoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSelect.toggle();
+            }
+        });
+
         // main text / title
         mName.setText(contact.getDisplayName());
 
@@ -86,6 +95,7 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         }
 
         // check box
+        mSelect.setChecked( contact.isChecked() );
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

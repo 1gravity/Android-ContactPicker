@@ -43,6 +43,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactFragment;
 import com.onegravity.contactpicker.group.GroupFragment;
@@ -51,6 +52,9 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class ContactPickerActivity extends AppCompatActivity {
 
@@ -69,6 +73,8 @@ public class ContactPickerActivity extends AppCompatActivity {
      */
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
 
+    public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
+
     private static ContactPictureType sBadgeType = ContactPictureType.ROUND;
     public static ContactPictureType getContactBadgeType() {
         return sBadgeType;
@@ -78,6 +84,8 @@ public class ContactPickerActivity extends AppCompatActivity {
     public static ContactDescription getContactDescription() {
         return sDescription;
     }
+
+    private PagerAdapter mAdapter;
 
     private boolean mAllChecked;
 
@@ -91,13 +99,19 @@ public class ContactPickerActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        // retrieve default title that to use if no contacts are selected
-        try {
-            ActivityInfo activityInfo = getPackageManager().getActivityInfo( getComponentName(), PackageManager.GET_META_DATA);
-            mDefaultTitle = activityInfo.loadLabel(getPackageManager()).toString();
+        // retrieve default title which is used if no contacts are selected
+        if (savedInstanceState == null) {
+            try {
+                PackageManager pkMgr = getPackageManager();
+                ActivityInfo activityInfo = pkMgr.getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
+                mDefaultTitle = activityInfo.loadLabel(pkMgr).toString();
+            }
+            catch (PackageManager.NameNotFoundException ignore) {
+                mDefaultTitle = getTitle().toString();
+            }
         }
-        catch (PackageManager.NameNotFoundException ignore) {
-            mDefaultTitle = getTitle().toString();
+        else {
+            mDefaultTitle = savedInstanceState.getString("mDefaultTitle");
         }
 
         // read Activity parameter ContactPictureType
@@ -124,24 +138,27 @@ public class ContactPickerActivity extends AppCompatActivity {
             }
         }
 
-
         setContentView(R.layout.contact_tab_layout);
 
         // initialize TabLayout
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabContent);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
         TabLayout.Tab tabContacts = tabLayout.newTab();
         tabContacts.setText(R.string.contact_tab_title);
         tabLayout.addTab(tabContacts);
+
         TabLayout.Tab tabGroups = tabLayout.newTab();
         tabGroups.setText(R.string.group_tab_title);
         tabLayout.addTab(tabGroups);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
-        PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+        mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(mAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -157,6 +174,9 @@ public class ContactPickerActivity extends AppCompatActivity {
     private static class PagerAdapter extends FragmentStatePagerAdapter {
         private int mNumOfTabs;
 
+        private ContactFragment mContactFragment;
+        private GroupFragment mGroupFragment;
+
         public PagerAdapter(FragmentManager fm, int numOfTabs) {
             super(fm);
             mNumOfTabs = numOfTabs;
@@ -165,8 +185,12 @@ public class ContactPickerActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0: return ContactFragment.newInstance();
-                case 1: return GroupFragment.newInstance();
+                case 0:
+                    mContactFragment = ContactFragment.newInstance();
+                    return mContactFragment;
+                case 1:
+                    mGroupFragment = GroupFragment.newInstance();
+                    return mGroupFragment;
                 default: return null;
             }
         }
@@ -174,6 +198,14 @@ public class ContactPickerActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return mNumOfTabs;
+        }
+
+        ContactFragment getContactFragment() {
+            return mContactFragment;
+        }
+
+        GroupFragment getGroupFragment() {
+            return mGroupFragment;
         }
     }
 
@@ -194,7 +226,9 @@ public class ContactPickerActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
         outState.putBoolean("mAllChecked", mAllChecked);
+        outState.putString("mDefaultTitle", mDefaultTitle);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -241,12 +275,17 @@ public class ContactPickerActivity extends AppCompatActivity {
     }
 
     private void onDone() {
-        //pass only checked contacts
-/*        ArrayList<ContactBase> contacts = mAdapter.getSelectedContacts();
-
-        Intent result = new Intent();
-        result.putExtra(ContactBase.CONTACTS_DATA, contacts);
-        setResult(Activity.RESULT_OK, result);*/
+        // return only checked contacts
+        ContactFragment fragment = mAdapter.getContactFragment();
+        if (fragment != null) {
+            List<Contact> contacts = fragment.getSelectedContacts();
+            Intent data = new Intent();
+            data.putExtra(RESULT_CONTACT_DATA, (Serializable) contacts);
+            setResult(Activity.RESULT_OK, data);
+        }
+        else {
+            setResult(Activity.RESULT_CANCELED);
+        }
 
         finish();
     }

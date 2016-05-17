@@ -29,8 +29,8 @@ public abstract class ContactBase implements Serializable {
 	final private long mId;
 	final private String mDisplayName;
 
-	private OnContactsCheckedListener mListener;
-	private boolean mChecked = false;
+	transient private OnContactsCheckedListener mListener;
+	transient private boolean mChecked = false;
 
 	public ContactBase(long id, String displayName) {
 		mId = id;

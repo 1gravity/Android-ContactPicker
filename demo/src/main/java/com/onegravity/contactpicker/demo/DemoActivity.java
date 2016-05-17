@@ -20,12 +20,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.BulletSpan;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.onegravity.contactpicker.ContactPickerActivity;
+import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.picture.ContactPictureType;
+
+import java.util.List;
 
 public class DemoActivity extends AppCompatActivity {
 
@@ -59,10 +66,26 @@ public class DemoActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CONTACT && resultCode == Activity.RESULT_OK &&
-            data != null && data.getData() != null) {
+            data != null && data.hasExtra(ContactPickerActivity.RESULT_CONTACT_DATA)) {
 
-            // // TODO: 5/9/2016
+            // we got a result from the contact picker --> show the picked contacts
+            TextView contactsView = (TextView) findViewById(R.id.contacts);
+            SpannableStringBuilder result = new SpannableStringBuilder();
+            try {
+                List<Contact> contacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
+                int pos = 0;
+                for (Contact contact : contacts) {
+                    String displayName = contact.getDisplayName();
+                    result.append(displayName + "\n");
+                    result.setSpan(new BulletSpan(15), pos, pos + displayName.length() + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    pos += displayName.length() + 1;
+                }
+            }
+            catch (Exception e) {
+                result.append(e.getMessage());
+            }
 
+            contactsView.setText(result);
         }
     }
 

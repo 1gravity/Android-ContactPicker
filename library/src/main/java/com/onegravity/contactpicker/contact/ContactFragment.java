@@ -349,13 +349,23 @@ public class ContactFragment extends Fragment implements
         }
     }
 
-    // ****************************************** Option Menu Methods *******************************************
+    // ****************************************** Misc Methods *******************************************
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         // TODO: 5/16/2016
         return super.onOptionsItemSelected(item);
+    }
+
+    public List<Contact> getSelectedContacts() {
+        List<Contact> result = new ArrayList<>();
+        for (Contact contact : mContacts) {
+            if (contact.isChecked()) {
+                result.add(contact);
+            }
+        }
+        return result;
     }
 
 }

@@ -41,7 +41,7 @@ public class Contact extends ContactBase {
 	private String mEmail = "";
 	private String mPhone = "";
 	private String mAddress = "";
-	private Uri mPhotoUri;
+	transient private Uri mPhotoUri;
 
 	public Contact(long id, String displayName, String firstName, String lastName, Uri photoUri) {
 		super(id, displayName);
