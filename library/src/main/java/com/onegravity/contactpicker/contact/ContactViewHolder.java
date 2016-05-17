@@ -22,7 +22,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.ContactCheckedEvent;
+import com.onegravity.contactpicker.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactBadge;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
@@ -30,33 +30,50 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 
 public class ContactViewHolder extends RecyclerView.ViewHolder {
 
-    private ContactBadge mBadge;
-    private CheckBox mSelect;
     private TextView mName;
     private TextView mDescription;
+    private ContactBadge mBadge;
+    private CheckBox mSelect;
 
-    private ContactPictureManager mContactPictureLoader;
-    private ContactPictureType mContactPictureType;
+    final private ContactPictureType mContactPictureType;
+    final private ContactDescription mContactDescription;
+    final private ContactPictureManager mContactPictureLoader;
 
-    ContactViewHolder(View root, ContactPictureType contactPictureType) {
+    ContactViewHolder(View root, ContactPictureManager contactPictureLoader) {
         super(root);
 
-        mSelect = (CheckBox) root.findViewById(R.id.select);
-        mBadge = (ContactBadge) root.findViewById(R.id.contact_badge);
         mName = (TextView) root.findViewById(R.id.name);
         mDescription = (TextView) root.findViewById(R.id.description);
+        mBadge = (ContactBadge) root.findViewById(R.id.contact_badge);
+        mSelect = (CheckBox) root.findViewById(R.id.select);
 
-        mContactPictureLoader = new ContactPictureManager(root.getContext(),
-                contactPictureType == ContactPictureType.ROUND);
-        mContactPictureType = contactPictureType;
+        mContactPictureType = ContactPickerActivity.getContactBadgeType();
+        mContactDescription = ContactPickerActivity.getContactDescription();
+        mContactPictureLoader = contactPictureLoader;
     }
 
-    void bind(Contact contact) {
+    void bind(final Contact contact) {
+        // main text / title
         mName.setText(contact.getDisplayName());
-        mDescription.setText(contact.getEmail());
+
+        // description
+        switch (mContactDescription) {
+            case EMAIL:
+                mDescription.setText(contact.getEmail());
+                break;
+            case PHONE:
+                mDescription.setText(contact.getPhone());
+                break;
+            case ADDRESS:
+                mDescription.setText(contact.getAddress());
+                break;
+        }
 
         // contact picture
-        if (mContactPictureType != ContactPictureType.NONE) {
+        if (mContactPictureType == ContactPictureType.NONE) {
+            mBadge.setVisibility(View.GONE);
+        }
+        else {
             String email = contact.getEmail();
             if (email != null) {
                 mBadge.assignContactFromEmail(email, true);
@@ -67,15 +84,12 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
                 mBadge.setVisibility(View.INVISIBLE);
             }
         }
-        else {
-            mBadge.setVisibility(View.GONE);
-        }
 
+        // check box
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                //contact.setChecked(isChecked);
-                ContactCheckedEvent.post();
+                contact.setChecked(isChecked);
             }
         });
     }

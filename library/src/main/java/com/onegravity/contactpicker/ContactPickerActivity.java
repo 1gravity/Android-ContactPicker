@@ -20,6 +20,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -41,38 +43,67 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.picture.ContactPictureType;
+import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactFragment;
 import com.onegravity.contactpicker.group.GroupFragment;
+import com.onegravity.contactpicker.picture.ContactPictureType;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class ContactPickerActivity extends AppCompatActivity {
 
-    //public static final String EXTRA_CONTACT_BADGE_TYPE = "EXTRA_CONTACT_BADGE_TYPE";
+    /**
+     * Use this parameter to determine whether the contact picture shows a contact badge and if yes
+     * what type (round, square)
+     *
+     * {@link com.onegravity.contactpicker.picture.ContactPictureType}
+     */
     public static final String EXTRA_CONTACT_BADGE_TYPE = "EXTRA_CONTACT_BADGE_TYPE";
 
-    private static ContactPictureType sBadgeType = ContactPictureType.ROUND;
+    /**
+     * Use this to define what contact information is used for the description field (second line)
+     *
+     * {@link com.onegravity.contactpicker.contact.ContactDescription}
+     */
+    public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
 
+    private static ContactPictureType sBadgeType = ContactPictureType.ROUND;
     public static ContactPictureType getContactBadgeType() {
         return sBadgeType;
     }
 
+    private static ContactDescription sDescription = ContactDescription.EMAIL;
+    public static ContactDescription getContactDescription() {
+        return sDescription;
+    }
+
     private boolean mAllChecked;
+
+    private String mDefaultTitle;
 
     // ****************************************** Lifecycle Methods *******************************************
 
-    @SuppressLint("MissingSuperCall")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // read Activity parameters
         Intent intent = getIntent();
+
+        // retrieve default title that to use if no contacts are selected
+        try {
+            ActivityInfo activityInfo = getPackageManager().getActivityInfo( getComponentName(), PackageManager.GET_META_DATA);
+            mDefaultTitle = activityInfo.loadLabel(getPackageManager()).toString();
+        }
+        catch (PackageManager.NameNotFoundException ignore) {
+            mDefaultTitle = getTitle().toString();
+        }
+
+        // read Activity parameter ContactPictureType
         sBadgeType = ContactPictureType.ROUND;
-        if (intent.hasExtra(EXTRA_CONTACT_BADGE_TYPE)) {
-            String tmp = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
+        String tmp = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
+        if (tmp != null) {
             try {
                 sBadgeType = ContactPictureType.valueOf(tmp);
             }
@@ -80,6 +111,19 @@ public class ContactPickerActivity extends AppCompatActivity {
                 Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_BADGE_TYPE value, defaulting to ROUND");
             }
         }
+
+        // read Activity parameter ContactDescription
+        sDescription = ContactDescription.EMAIL;
+        tmp = intent.getStringExtra(EXTRA_CONTACT_DESCRIPTION);
+        if (tmp != null) {
+            try {
+                sDescription = ContactDescription.valueOf(tmp);
+            }
+            catch (IllegalArgumentException e) {
+                Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_DESCRIPTION value, defaulting to EMAIL");
+            }
+        }
+
 
         setContentView(R.layout.contact_tab_layout);
 
@@ -137,36 +181,14 @@ public class ContactPickerActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-/*        mListView = (ListView) findViewById(android.R.id.list);
-        mProgressBar = (ProgressBar) findViewById(R.id.progress);
-
-        loadContacts();
-
         EventBus.getDefault().register(this);
-
-        mListView.setClickable(true);
-        mListView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
-                ContactBase contact = mAdapter.getContact(pos);
-                contact.setChecked(! contact.isChecked());
-                mAdapter.notifyDataSetChanged();
-                ContactCheckedEvent.post();
-            }
-        });
-        mListView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        mListView.setScrollingCacheEnabled(true);
-        mListView.setSmoothScrollbarEnabled(false);
-        mListView.setCacheColorHint(0);
-        mListView.setFastScrollEnabled(true);*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-//        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -176,21 +198,15 @@ public class ContactPickerActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(ContactCheckedEvent event) {
-//        setTitle(getString(R.string.actionmode_selected, mAdapter.getNrOfSelectedContacts()));
+    public void onEventMainThread(ContactsCheckedEvent event) {
+        int nrOfContacts = event.getNrOfContacts();
+        if (nrOfContacts == 0) {
+            setTitle(mDefaultTitle);
+        }
+        else {
+            setTitle(getString(R.string.actionmode_selected, nrOfContacts));
+        }
     }
-
-    // ****************************************** Lifecycle Methods *******************************************
-
-/*    private Contact createContact(Cursor cursor, String id, String email) {
-        String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
-        //Divide display name to first and last
-        String[] names = displayName != null ? displayName.split("\\s+") : new String[]{"---", "---"};
-        String firstName = names.length >= 1 ? names[0] : displayName;
-        String lastName = names.length >= 2 ? names[1] : "";
-        return Helper.isNullOrEmpty(email) ? null : new Contact(id, firstName, lastName, displayName, email);
-    }*/
 
     // ****************************************** Option Menu *******************************************
 

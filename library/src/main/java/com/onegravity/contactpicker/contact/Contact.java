@@ -39,12 +39,14 @@ public class Contact extends ContactBase {
 	private String mFirstName = "";
 	private String mLastName = "";
 	private String mEmail = "";
+	private String mPhone = "";
+	private String mAddress = "";
 	private Uri mPhotoUri;
 
-	public Contact(long id, String displayName, String firstname, String lastname, Uri photoUri) {
+	public Contact(long id, String displayName, String firstName, String lastName, Uri photoUri) {
 		super(id, displayName);
-		mFirstName = Helper.isNullOrEmpty(firstname) ? "---" : firstname;
-		mLastName = Helper.isNullOrEmpty(lastname) ? "---" : lastname;
+		mFirstName = Helper.isNullOrEmpty(firstName) ? "---" : firstName;
+		mLastName = Helper.isNullOrEmpty(lastName) ? "---" : lastName;
 		mPhotoUri = photoUri;
 	}
 
@@ -62,6 +64,22 @@ public class Contact extends ContactBase {
 
 	public void setEmail(String value) {
 		mEmail = value;
+	}
+
+	public String getPhone() {
+		return mPhone;
+	}
+
+	public void setPhone(String value) {
+		mPhone = value;
+	}
+
+	public String getAddress() {
+		return mAddress;
+	}
+
+	public void setAddress(String value) {
+		mAddress = value;
 	}
 
 	public String getKey() {

@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker;
+package com.onegravity.contactpicker.contact;
 
-import org.greenrobot.eventbus.EventBus;
-
-/**
- * A contact has been checked -> update title
- * 
- * Publisher: ContactAdapter
- * Subscriber: ContactPickerActivity
- */
-public class ContactCheckedEvent {
-
-	private static final ContactCheckedEvent EVENT = new ContactCheckedEvent();
-
-	public static void post() {
-		EventBus.getDefault().post(EVENT);
-	}
-
+public enum ContactDescription {
+    PHONE,
+    EMAIL,
+    ADDRESS
 }

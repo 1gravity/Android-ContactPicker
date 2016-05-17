@@ -34,20 +34,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.onegravity.contactpicker.ContactBase;
+import com.onegravity.contactpicker.ContactsCheckedEvent;
 import com.onegravity.contactpicker.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ContactFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ContactFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<Cursor>,
+        ContactBase.OnContactsCheckedListener {
 
     private TreeMap<Integer, Bundle> mLoaderIds;
 
+    /*
+     * List of all contacts.
+     */
     private List<Contact> mContacts = new ArrayList<>();
+
+    /*
+     * Mao of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
+     */
     private Map<String, Contact> mContactsByLookupKey = new HashMap<>();
+
+    private int mSelectedContacts = 0;
 
     private ContactAdapter mAdapter;
 
@@ -121,7 +135,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         recyclerView.setLayoutManager(layoutManager);
 
         // create adapter for the RecyclerView
-        mAdapter = new ContactAdapter(null);
+        mAdapter = new ContactAdapter(rootLayout.getContext(), null);
         recyclerView.setAdapter(mAdapter);
 
         return rootLayout;
@@ -230,6 +244,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
 
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                 mContactsByLookupKey.put(lookupKey, contact);
+                contact.setOnContactCheckedListener(this);
 
                 Log.e("1gravity", "lookupKey: " + lookupKey);
 //                Log.e("1gravity", "id: " + contact.getId());
@@ -280,6 +295,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         else if (mime.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
             String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             String type = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+            contact.setPhone(phone);
             Log.e("1gravity", "  phone: "  + phone);
             Log.e("1gravity", "  type: "  + type);
         }
@@ -292,6 +308,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
             String REGION = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION));
             String POSTCODE = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE));
             String COUNTRY = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY));
+            contact.setAddress(FORMATTED_ADDRESS.replaceAll("\\n", ", "));
             Log.e("1gravity", "  FORMATTED_ADDRESS: "  + FORMATTED_ADDRESS);
             Log.e("1gravity", "  TYPE: "  + TYPE);
             Log.e("1gravity", "  STREET: "  + STREET);
@@ -313,13 +330,32 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         }
     }
 
+    @Override
+    public void onContactChecked(ContactBase contact, boolean wasChecked, boolean isChecked) {
+        onContactsChecked(Collections.singletonList(contact), wasChecked, isChecked);
+    }
+
+    @Override
+    public void onContactsChecked(List<ContactBase> contacts, boolean wasChecked, boolean isChecked) {
+        if (wasChecked != isChecked) {
+            int nrOfContacts = contacts.size();
+            if (isChecked) {
+                mSelectedContacts =  Math.min(mContacts.size(), mSelectedContacts + nrOfContacts);
+            }
+            else {
+                mSelectedContacts = Math.max(0, mSelectedContacts - nrOfContacts);
+            }
+            ContactsCheckedEvent.post(mSelectedContacts);
+        }
+    }
 
     // ****************************************** Option Menu Methods *******************************************
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        return true;	// don't call super.onOptionsItemSelected because we got some StackOverflowErrors on Honeycomb
+        // TODO: 5/16/2016
+        return super.onOptionsItemSelected(item);
     }
 
 }

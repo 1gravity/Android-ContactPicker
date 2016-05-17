@@ -24,6 +24,8 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.onegravity.contactpicker.ContactPickerActivity;
+import com.onegravity.contactpicker.contact.ContactDescription;
+import com.onegravity.contactpicker.picture.ContactPictureType;
 
 public class DemoActivity extends AppCompatActivity {
 
@@ -42,7 +44,9 @@ public class DemoActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class);
+                    Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE, ContactPictureType.ROUND.name())
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION, ContactDescription.ADDRESS.name());
                     startActivityForResult(intent, REQUEST_CONTACT);
                 }
             });

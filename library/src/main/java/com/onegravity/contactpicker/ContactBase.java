@@ -17,33 +17,24 @@
 package com.onegravity.contactpicker;
 
 import java.io.Serializable;
+import java.util.List;
 
-public class ContactBase implements Serializable {
+public abstract class ContactBase implements Serializable {
 
-	public interface OnCheckedChangeListener {
-		void onCheckedChanged(ContactBase contact, boolean isChecked);
+	public interface OnContactsCheckedListener {
+		void onContactChecked(ContactBase contact, boolean wasChecked, boolean isChecked);
+		void onContactsChecked(List<ContactBase> contacts, boolean wasChecked, boolean isChecked);
 	}
 
-	public static final String CONTACTS_DATA = "CONTACTS_DATA";
+	final private long mId;
+	final private String mDisplayName;
 
-	private long mId;
-	private String mDisplayName = "";
+	private OnContactsCheckedListener mListener;
 	private boolean mChecked = false;
-	private OnCheckedChangeListener mListener;
 
 	public ContactBase(long id, String displayName) {
 		mId = id;
 		mDisplayName = Helper.isNullOrEmpty(displayName) ? "---" : displayName;
-	}
-
-	void setOnCheckedChangedListener(OnCheckedChangeListener listener) {
-		mListener = listener;
-	}
-
-	void removeOnCheckedChangedListener(OnCheckedChangeListener listener) {
-		if (mListener == listener) {
-			mListener = null;
-		}
 	}
 
 	public long getId() {
@@ -51,20 +42,35 @@ public class ContactBase implements Serializable {
 	}
 
 	public String getDisplayName() {
-		return mDisplayName;
+		return mDisplayName != null ? mDisplayName : "";
 	}
 
-	boolean isChecked() {
+	public void setOnContactCheckedListener(OnContactsCheckedListener listener) {
+		mListener = listener;
+	}
+
+	public boolean isChecked() {
 		return mChecked;
 	}
 
-	void setChecked(boolean checked) {
-		if (checked != mChecked) {
-			mChecked = checked;
-			if (mListener != null) {
-				mListener.onCheckedChanged(this, checked);
-			}
+	/**
+	 * Note: the Group class must override this method since usually more than one contact is
+	 * checked/unchecked at a time.
+     */
+	public void setChecked(boolean checked) {
+		boolean wasChecked = mChecked;
+		mChecked = checked;
+		if (mListener != null && wasChecked != checked) {
+			mListener.onContactChecked(this, wasChecked, checked);
 		}
+	}
+
+	/**
+	 * Sub classes should override this method if the number of contacts this object represents is
+	 * not 1 (Groups).
+     */
+	protected int getNrOfContacts() {
+		return 1;
 	}
 
 	@Override
