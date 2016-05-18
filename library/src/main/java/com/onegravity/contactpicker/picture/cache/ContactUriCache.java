@@ -25,7 +25,8 @@ public class ContactUriCache extends InMemoryCache<String, Uri> {
 
     private static ContactUriCache sInstance;
 
-    public static ContactUriCache getInstance() {
+    // we need to synchronize this to make sure there's no race condition instantiating the cache
+    public synchronized static ContactUriCache getInstance() {
         if (sInstance==null) {
             sInstance = new ContactUriCache();
         }

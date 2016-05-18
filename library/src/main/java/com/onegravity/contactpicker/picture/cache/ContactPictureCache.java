@@ -26,8 +26,9 @@ public class ContactPictureCache extends InMemoryCache<Uri, Bitmap> {
     private static ContactPictureCache sInstance;
     private static int sMemClass;
 
-    public static ContactPictureCache getInstance(Context context) {
-        if (sInstance==null) {
+    // we need to synchronize this to make sure there's no race condition instantiating the cache
+    public synchronized static ContactPictureCache getInstance(Context context) {
+        if (sInstance == null) {
             ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             sMemClass = activityManager.getMemoryClass();
             sInstance = new ContactPictureCache();
