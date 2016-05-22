@@ -22,7 +22,10 @@
     <string name="no_contacts">No Contacts</string>
     <string name="no_groups">No Groups</string>
 
-    <string name="actionmode_selected">%s selected</string>
+    <string name="group_desription_no_contacts">%s</string>
+    <string name="group_desription">%1$s (%2$d contacts)</string>
+
+    <string name="actionmode_selected">%d selected</string>
 
     <string name="action_search">Search</string>
 

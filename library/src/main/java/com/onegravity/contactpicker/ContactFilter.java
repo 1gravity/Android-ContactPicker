@@ -31,7 +31,7 @@ public class ContactFilter extends Filter {
     /**
      * All contacts.
      */
-    private ArrayList<ContactBase> mOriginalValues = null;
+    private ArrayList<ContactElement> mOriginalValues = null;
 
     public ContactFilter(ContactAdapter adapter) {
         mAdapter = adapter;
@@ -55,7 +55,7 @@ public class ContactFilter extends Filter {
         }
 
         if (Helper.isNullOrEmpty(searchTerm)) {
-            ArrayList<ContactBase> list = new ArrayList<>(mOriginalValues);
+            ArrayList<ContactElement> list = new ArrayList<>(mOriginalValues);
             results.values = list;
             results.count = list.size();
         }
@@ -64,11 +64,11 @@ public class ContactFilter extends Filter {
             final String[] words = searchTermString.split(" ");
             final int wordCount = words.length;
 
-            final ArrayList<ContactBase> values = mOriginalValues;
+            final ArrayList<ContactElement> values = mOriginalValues;
 
-            final ArrayList<ContactBase> newValues = new ArrayList<>();
+            final ArrayList<ContactElement> newValues = new ArrayList<>();
 
-            for (final ContactBase value : values) {
+            for (final ContactElement value : values) {
                 final String valueText = value.toString().toLowerCase(Locale.getDefault());
 
                 for (int k = 0; k < wordCount; k++) {
@@ -95,10 +95,10 @@ public class ContactFilter extends Filter {
         // Don't notify for every change
         mAdapter.setNotifyOnChange(false);
         try {
-            final List<ContactBase> contacts = (List<ContactBase>) results.values;
+            final List<ContactElement> contacts = (List<ContactElement>) results.values;
             //mAdapter.clear();
             if (contacts != null) {
-                for (ContactBase contact : contacts) {
+                for (ContactElement contact : contacts) {
                     if (contact != null) {
               //        mAdapter.add(contact);
                     }

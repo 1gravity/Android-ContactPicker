@@ -17,7 +17,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "com.onegravity.contactpicker.demo"
@@ -52,6 +52,9 @@ android {
 dependencies {
     // use this to compile/run locally
     compile project(':library')
+
+    def supportLibVersion = '23.4.0'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
 
     // or this to use the latest published library
     //compile 'com.1gravity:android-contactpicker:1.0.0'

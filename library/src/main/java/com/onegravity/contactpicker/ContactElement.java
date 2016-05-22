@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.group;
+package com.onegravity.contactpicker;
 
-import com.onegravity.contactpicker.ContactElement;
-import com.onegravity.contactpicker.contact.Contact;
-
-import java.util.Set;
+import java.io.Serializable;
 
 /**
- * This interface describes a group contact.
- * It only provides read methods to make sure no class outside this package can modify it.
- * Write access is only possible through the GroupImpl class which has package access.
+ * A ContactElement (single contact or group) always has a unique id and a display name.
+ * It also can be checked/unchecked and can be observer by attaching an OnContactsCheckedListener.
  */
-public interface Group extends ContactElement {
+public interface ContactElement extends Serializable {
 
-	Set<Contact> getContacts();
+	public long getId();
+
+	public String getDisplayName();
+
+    public boolean isChecked();
+
+	public void setChecked(boolean checked);
+
+    public void setOnContactCheckedListener(OnContactsCheckedListener listener);
 
 }

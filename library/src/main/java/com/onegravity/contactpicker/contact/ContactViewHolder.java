@@ -104,4 +104,8 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    void onRecycled() {
+        mBadge.onDestroy();
+    }
+
 }

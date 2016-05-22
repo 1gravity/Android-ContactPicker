@@ -34,13 +34,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.contact.Contact;
+import com.onegravity.contactpicker.contact.ContactsLoaded;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private List<Group> mGroups = new ArrayList<>();
+    private List<GroupImpl> mGroups = new ArrayList<>();
+    private Map<Long, GroupImpl> mGroupsById = new HashMap<>();
 
     private GroupAdapter mAdapter;
 
@@ -92,15 +101,16 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onResume() {
         super.onResume();
-        //EventBus.getDefault().register(this);
 
+        EventBus.getDefault().register(this);
         getLoaderManager().initLoader(GROUPS_LOADER_ID, null, this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //EventBus.getDefault().unregister(this);
+
+        EventBus.getDefault().unregister(this);
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -133,6 +143,7 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public synchronized void onLoaderReset(Loader<Cursor> loader) {
         mGroups.clear();
+        mGroupsById.clear();
         mAdapter.setData(mGroups);
     }
 
@@ -148,24 +159,59 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
             if (cursor.moveToFirst()) {
                 cursor.moveToPrevious();
                 while (cursor.moveToNext()) {
-                    String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups._ID));
-                    String title = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.TITLE));
-                    Group group = Group.fromCursor(cursor);
-                    // // TODO: 5/11/2016 deal with duplicates...
+                    GroupImpl group = GroupImpl.fromCursor(cursor);
+
+                    // TODO: 5/11/2016 deal with duplicates...
+
                     mGroups.add(group);
+                    mGroupsById.put(group.getId(), group);
+
+                    Log.e("1gravity", "group " + group.getId() + ": " + group.getDisplayName());
+
                     String ACCOUNT_TYPE = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.ACCOUNT_TYPE));
                     String ACCOUNT_NAME = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.ACCOUNT_NAME));
-                    Log.e("1gravity", "group " + id + ": " + title);
                     Log.e("1gravity", "ACCOUNT_TYPE " + ACCOUNT_TYPE);
                     Log.e("1gravity", "ACCOUNT_NAME " + ACCOUNT_NAME);
                 }
             }
 
+            GroupsLoaded.post( mGroups );
+
             mAdapter.setData(mGroups);
+            if (mContacts != null && !mContacts.isEmpty()) {
+                processContacts(mContacts);
+            }
         }
     }
 
-    // ****************************************** Option Menu Methods *******************************************
+    // ****************************************** Misc Methods *******************************************
+
+    List<? extends Contact> mContacts;
+
+    private void processContacts(List<? extends Contact> contacts) {
+        List<Integer> mGroupsChanged = new ArrayList<>();
+        for (Contact contact : contacts) {
+            for (Long groupId : contact.getGroupIds()) {
+                GroupImpl group = mGroupsById.get(groupId);
+                if (group != null) {
+                    group.addContact(contact);
+                }
+            }
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ContactsLoaded event) {
+        EventBus.getDefault().removeStickyEvent(event);
+        if (mGroups.isEmpty()) {
+            mContacts = event.getContacts();
+        }
+        else {
+            processContacts(event.getContacts());
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

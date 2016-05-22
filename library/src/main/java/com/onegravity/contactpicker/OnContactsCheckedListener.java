@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.group;
+package com.onegravity.contactpicker;
 
-import com.onegravity.contactpicker.ContactElement;
-import com.onegravity.contactpicker.contact.Contact;
+import java.util.List;
 
-import java.util.Set;
+public interface OnContactsCheckedListener {
 
-/**
- * This interface describes a group contact.
- * It only provides read methods to make sure no class outside this package can modify it.
- * Write access is only possible through the GroupImpl class which has package access.
- */
-public interface Group extends ContactElement {
+	void onContactChecked(ContactElement contact, boolean wasChecked, boolean isChecked);
 
-	Set<Contact> getContacts();
+	void onContactsChecked(List<ContactElement> contacts, boolean wasChecked, boolean isChecked);
 
 }

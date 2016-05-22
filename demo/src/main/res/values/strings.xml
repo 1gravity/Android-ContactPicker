@@ -19,4 +19,9 @@
     <string name="app_name">Contact Picker</string>
     <string name="pick_contacts">Pick contact(s)</string>
     <string name="picked_contacts">Picked contact(s)</string>
+
+    <string name="permission_denied">Permission denied</string>
+    <string name="permission_denied_contacts">The contact picker won\'t work without this permission. Are you sure you want to deny this permission?</string>
+    <string name="permission_deny">Deny</string>
+    <string name="permission_retry">Re-try</string>
 </resources>

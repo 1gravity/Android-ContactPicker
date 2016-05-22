@@ -16,6 +16,7 @@
 
 package com.onegravity.contactpicker;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -96,6 +97,31 @@ public class ContactPickerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int uid = 0;
+        int pid = 0;
+        PackageManager pckMgr = getPackageManager();
+        try {
+            uid = pckMgr.getApplicationInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
+            //uid = pckMgr.getPermissionInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            enforcePermission(Manifest.permission.READ_CONTACTS, pid, uid, "Contact permission hasn't been granted to this app, terminating.");
+        }
+        catch (SecurityException e) {
+            Log.e(getClass().getSimpleName(), e.getMessage());
+            finish();
+            return;
+        }
+
+        /*if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_DENIED) {
+            Log.e(getClass().getSimpleName(), "Contact permission hasn't been granted to this app, terminating.");
+            finish();
+            return;
+        }*/
 
         Intent intent = getIntent();
 

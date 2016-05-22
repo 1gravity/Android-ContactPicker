@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
-    private List<Contact> mContacts;
+    private List<? extends Contact> mContacts;
 
     final private ContactPictureType mContactPictureType;
     final private ContactDescription mContactDescription;
@@ -55,7 +55,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
         mContactPictureLoader = new ContactPictureManager(context, mContactPictureType == ContactPictureType.ROUND);
     }
 
-    public void setData(List<Contact> contacts) {
+    public void setData(List<? extends Contact> contacts) {
         mContacts = contacts;
         notifyDataSetChanged();
     }
@@ -75,6 +75,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
         if (mContacts != null) {
             holder.bind( mContacts.get(position) );
         }
+    }
+
+    @Override
+    public void onViewRecycled(ContactViewHolder holder) {
+        holder.onRecycled();
     }
 
     @Override

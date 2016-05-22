@@ -16,18 +16,31 @@
 
 package com.onegravity.contactpicker.group;
 
-import com.onegravity.contactpicker.ContactElement;
-import com.onegravity.contactpicker.contact.Contact;
+import org.greenrobot.eventbus.EventBus;
 
-import java.util.Set;
+import java.util.List;
 
 /**
- * This interface describes a group contact.
- * It only provides read methods to make sure no class outside this package can modify it.
- * Write access is only possible through the GroupImpl class which has package access.
+ * All groups have been loaded.
+ *
+ * Publisher: GroupFragment
+ * Subscriber: ContactFragment
  */
-public interface Group extends ContactElement {
+public class GroupsLoaded {
 
-	Set<Contact> getContacts();
+	public static void post(List<? extends Group> groups) {
+		GroupsLoaded event = new GroupsLoaded(groups);
+		EventBus.getDefault().postSticky( event );
+	}
+
+	final private List<? extends Group> mGroups;
+
+	private GroupsLoaded(List<? extends Group> groups) {
+		mGroups = groups;
+	}
+
+	public List<? extends Group> getGroups() {
+		return mGroups;
+	}
 
 }

@@ -16,32 +16,31 @@
 
 package com.onegravity.contactpicker.contact;
 
-import android.net.Uri;
+import org.greenrobot.eventbus.EventBus;
 
-import com.onegravity.contactpicker.ContactElement;
-
-import java.util.Set;
+import java.util.List;
 
 /**
- * This interface describes a single contact.
- * It only provides read methods to make sure no class outside this package can modify it.
- * Write access is only possible through the ContactImpl class which has package access.
+ * All contacts have been loaded (including details).
+ *
+ * Publisher: ContactFragment
+ * Subscriber: GroupFragment
  */
-public interface Contact extends ContactElement {
+public class ContactsLoaded {
 
-	public String getFirstName();
+	public static void post(List<? extends Contact> contacts) {
+		ContactsLoaded event = new ContactsLoaded(contacts);
+		EventBus.getDefault().postSticky( event );
+	}
 
-	public String getLastName();
+	final private List<? extends Contact> mContacts;
 
-	public String getEmail();
+	private ContactsLoaded(List<? extends Contact> contacts) {
+		mContacts = contacts;
+	}
 
-	public String getPhone();
+	public List<? extends Contact> getContacts() {
+		return mContacts;
+	}
 
-	public String getAddress();
-
-	public String getKey();
-
-	public Uri getPhotoUri();
-
-    public Set<Long> getGroupIds();
 }

@@ -32,6 +32,9 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
     private final ContactBadge mBadge;
     private final String[] mExcludeMimes;
 
+    private int mToken;
+    private boolean mCancelled;
+
     public ContactBadgeQueryHandler(ContactBadge badge, String[] excludeMimes) {
         super(badge.getContext().getContentResolver());
         mBadge = badge;
@@ -39,7 +42,22 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
     }
 
     @Override
+    public void startQuery(int token, Object cookie, Uri uri,
+                           String[] projection, String selection, String[] selectionArgs,
+                           String orderBy) {
+        mToken = token;
+        super.startQuery(token, cookie, uri, projection, selection, selectionArgs, orderBy);
+    }
+
+    public final void cancelOperation() {
+        mCancelled = true;
+        super.cancelOperation(mToken);
+    }
+
+    @Override
     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+        if (mCancelled) return;
+
         Uri lookupUri = null;
         Uri createUri = null;
         boolean trigger = false;
@@ -82,6 +100,8 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
             Helper.closeQuietly(cursor);
         }
 
+        if (mCancelled) return;
+
         mBadge.setContactUri(lookupUri);
 
         Context context = mBadge.getContext();
@@ -99,4 +119,5 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
             context.startActivity(intent);
         }
     }
+
 }

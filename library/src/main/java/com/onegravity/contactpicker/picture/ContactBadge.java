@@ -169,6 +169,14 @@ public class ContactBadge extends View implements OnClickListener {
         paint.setAntiAlias(true);
     }
 
+    public synchronized void onDestroy() {
+        mDrawable = null;
+        if (mQueryHandler != null) {
+            mQueryHandler.cancelOperation();
+        }
+        mQueryHandler = null;
+    }
+
     // ****************************************** Contact Picture Methods *******************************************
 
     /**

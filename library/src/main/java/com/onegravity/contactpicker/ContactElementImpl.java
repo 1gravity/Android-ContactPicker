@@ -16,15 +16,10 @@
 
 package com.onegravity.contactpicker;
 
-import java.io.Serializable;
-import java.util.List;
-
-public abstract class ContactBase implements Serializable {
-
-	public interface OnContactsCheckedListener {
-		void onContactChecked(ContactBase contact, boolean wasChecked, boolean isChecked);
-		void onContactsChecked(List<ContactBase> contacts, boolean wasChecked, boolean isChecked);
-	}
+/**
+ * The concrete but abstract implementation of ContactElement.
+ */
+public abstract class ContactElementImpl implements ContactElement {
 
 	final private long mId;
 	final private String mDisplayName;
@@ -32,46 +27,42 @@ public abstract class ContactBase implements Serializable {
 	transient private OnContactsCheckedListener mListener;
 	transient private boolean mChecked = false;
 
-	public ContactBase(long id, String displayName) {
+	public ContactElementImpl(long id, String displayName) {
 		mId = id;
 		mDisplayName = Helper.isNullOrEmpty(displayName) ? "---" : displayName;
 	}
 
+	@Override
 	public long getId() {
 		return mId;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return mDisplayName != null ? mDisplayName : "";
 	}
 
-	public void setOnContactCheckedListener(OnContactsCheckedListener listener) {
-		mListener = listener;
-	}
-
+	@Override
 	public boolean isChecked() {
 		return mChecked;
 	}
 
-	/**
-	 * Note: the Group class must override this method since usually more than one contact is
-	 * checked/unchecked at a time.
-     */
+	@Override
 	public void setChecked(boolean checked) {
 		boolean wasChecked = mChecked;
 		mChecked = checked;
 		if (mListener != null && wasChecked != checked) {
-			mListener.onContactChecked(this, wasChecked, checked);
+            notifyOnContactsCheckedListener(mListener, wasChecked, checked);
 		}
 	}
 
-	/**
-	 * Sub classes should override this method if the number of contacts this object represents is
-	 * not 1 (Groups).
-     */
-	protected int getNrOfContacts() {
-		return 1;
-	}
+    protected abstract void notifyOnContactsCheckedListener(OnContactsCheckedListener listener,
+                                                            boolean wasChecked, boolean isChecked);
+
+    @Override
+    public void setOnContactCheckedListener(OnContactsCheckedListener listener) {
+        mListener = listener;
+    }
 
 	@Override
 	public String toString() {

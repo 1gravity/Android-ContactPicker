@@ -19,7 +19,6 @@ package com.onegravity.contactpicker.demo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BulletSpan;
@@ -34,7 +33,7 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 
 import java.util.List;
 
-public class DemoActivity extends AppCompatActivity {
+public class DemoActivity extends BaseActivity {
 
     private static final int REQUEST_CONTACT = 0;
 

@@ -34,9 +34,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.onegravity.contactpicker.ContactBase;
+import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.ContactsCheckedEvent;
+import com.onegravity.contactpicker.OnContactsCheckedListener;
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.group.Group;
+import com.onegravity.contactpicker.group.GroupsLoaded;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,19 +54,19 @@ import java.util.TreeMap;
 
 public class ContactFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor>,
-        ContactBase.OnContactsCheckedListener {
+        OnContactsCheckedListener {
 
     private TreeMap<Integer, Bundle> mLoaderIds;
 
     /*
      * List of all contacts.
      */
-    private List<Contact> mContacts = new ArrayList<>();
+    private List<ContactImpl> mContacts = new ArrayList<>();
 
     /*
      * Mao of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
      */
-    private Map<String, Contact> mContactsByLookupKey = new HashMap<>();
+    private Map<String, ContactImpl> mContactsByLookupKey = new HashMap<>();
 
     private int mSelectedContacts = 0;
 
@@ -144,6 +151,7 @@ public class ContactFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         setHasOptionsMenu(true);
     }
 
@@ -151,14 +159,15 @@ public class ContactFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
+        EventBus.getDefault().register(this);
         getLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
-//        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        EventBus.getDefault().unregister(this);
+
+        EventBus.getDefault().unregister(this);
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -239,7 +248,7 @@ public class ContactFragment extends Fragment implements
             cursor.moveToPrevious();
             int count = 0;
             while (cursor.moveToNext()) {
-                Contact contact = Contact.fromCursor(cursor);
+                ContactImpl contact = ContactImpl.fromCursor(cursor);
                 mContacts.add(contact);
 
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
@@ -273,17 +282,19 @@ public class ContactFragment extends Fragment implements
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.LOOKUP_KEY));
 
                 Log.e("1gravity", "lookupKey: " + lookupKey);
-                Contact contact = mContactsByLookupKey.get(lookupKey);
+                ContactImpl contact = mContactsByLookupKey.get(lookupKey);
                 if (contact != null) {
                     updateContact(cursor, contact);
                 }
             }
         }
 
+        ContactsLoaded.post( mContacts );
+
         mAdapter.setData(mContacts);
     }
 
-    private void updateContact(Cursor cursor, Contact contact) {
+    private void updateContact(Cursor cursor, ContactImpl contact) {
         String mime = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
         if (mime.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
             String email = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
@@ -321,22 +332,25 @@ public class ContactFragment extends Fragment implements
         else if (mime.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
             String firstName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
             String lastName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
+            contact.setFirstName(firstName);
+            contact.setLastName(lastName);
             Log.e("1gravity", "  first name: "  + firstName);
             Log.e("1gravity", "  last name: "  + lastName);
         }
         else if (mime.equals(ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE)) {
-            Long groupId = cursor.getLong(cursor.getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID));
+            int groupId = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID));
             Log.e("1gravity", "  groupId: "  + groupId);
+            contact.addGroupId(groupId);
         }
     }
 
     @Override
-    public void onContactChecked(ContactBase contact, boolean wasChecked, boolean isChecked) {
+    public void onContactChecked(ContactElement contact, boolean wasChecked, boolean isChecked) {
         onContactsChecked(Collections.singletonList(contact), wasChecked, isChecked);
     }
 
     @Override
-    public void onContactsChecked(List<ContactBase> contacts, boolean wasChecked, boolean isChecked) {
+    public void onContactsChecked(List<ContactElement> contacts, boolean wasChecked, boolean isChecked) {
         if (wasChecked != isChecked) {
             int nrOfContacts = contacts.size();
             if (isChecked) {
@@ -350,6 +364,16 @@ public class ContactFragment extends Fragment implements
     }
 
     // ****************************************** Misc Methods *******************************************
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(GroupsLoaded event) {
+        EventBus.getDefault().removeStickyEvent(event);
+
+        for (Group group : event.getGroups()) {
+            long groupId = group.getId();
+
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
