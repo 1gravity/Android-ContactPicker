@@ -98,30 +98,18 @@ public class ContactPickerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int uid = 0;
-        int pid = 0;
-        PackageManager pckMgr = getPackageManager();
+        // check if we have the READ_CONTACTS permission, if not --> terminate
         try {
-            uid = pckMgr.getApplicationInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
-            //uid = pckMgr.getPermissionInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            int pid = android.os.Process.myPid();
+            PackageManager pckMgr = getPackageManager();
+            int uid = pckMgr.getApplicationInfo(getComponentName().getPackageName(), PackageManager.GET_META_DATA).uid;
             enforcePermission(Manifest.permission.READ_CONTACTS, pid, uid, "Contact permission hasn't been granted to this app, terminating.");
         }
-        catch (SecurityException e) {
+        catch (PackageManager.NameNotFoundException | SecurityException e) {
             Log.e(getClass().getSimpleName(), e.getMessage());
             finish();
             return;
         }
-
-        /*if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_DENIED) {
-            Log.e(getClass().getSimpleName(), "Contact permission hasn't been granted to this app, terminating.");
-            finish();
-            return;
-        }*/
 
         Intent intent = getIntent();
 
