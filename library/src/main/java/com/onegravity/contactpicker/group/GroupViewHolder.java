@@ -16,7 +16,7 @@
 
 package com.onegravity.contactpicker.group;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
@@ -26,13 +26,14 @@ import android.widget.TextView;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
 
-import java.util.Set;
+import java.util.Collection;
 
 public class GroupViewHolder extends RecyclerView.ViewHolder {
 
     private View mRoot;
     private CheckBox mSelect;
     private TextView mName;
+    private TextView mDescription;
 
     GroupViewHolder(View root) {
         super(root);
@@ -40,6 +41,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         mRoot = root;
         mSelect = (CheckBox) root.findViewById(R.id.select);
         mName = (TextView) root.findViewById(R.id.name);
+        mDescription = (TextView) root.findViewById(R.id.description);
     }
 
     void bind(final Group group) {
@@ -51,13 +53,13 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         });
 
         // main text / title
-        Context context = mRoot.getContext();
-        Set<Contact> contacts = group.getContacts();
-        String dispName = group.getDisplayName();
-        String name = contacts.isEmpty() ?
-                context.getString(R.string.group_desription_no_contacts, dispName) :
-                context.getString(R.string.group_desription, dispName, contacts.size());
-        mName.setText(name);
+        mName.setText(group.getDisplayName());
+
+        // description
+        Collection<Contact> contacts = group.getContacts();
+        Resources res = mRoot.getContext().getResources();
+        String desc = res.getQuantityString(R.plurals.group_description, contacts.size(), contacts.size());
+        mDescription.setText(desc);
 
         // check box
         mSelect.setChecked( group.isChecked() );

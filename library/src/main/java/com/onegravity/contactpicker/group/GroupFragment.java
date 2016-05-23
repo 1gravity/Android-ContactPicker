@@ -16,7 +16,6 @@
 
 package com.onegravity.contactpicker.group;
 
-
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,18 +47,24 @@ import java.util.Map;
 
 public class GroupFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    // only groups with contacts will be shown
+    private List<GroupImpl> mVisibleGroups = new ArrayList<>();
+
+    // the complete list of contacts
     private List<GroupImpl> mGroups = new ArrayList<>();
+
+    // groups by id to find them once the contacts are loaded
     private Map<Long, GroupImpl> mGroupsById = new HashMap<>();
+
+    // store the contacts in case the groups haven't been loaded yet
+    private List<? extends Contact> mContacts;
 
     private GroupAdapter mAdapter;
 
     // ****************************************** Lifecycle Methods *******************************************
 
     public static GroupFragment newInstance() {
-        GroupFragment frag = new GroupFragment();
-        Bundle args = new Bundle();
-        frag.setArguments(args);
-        return frag;
+        return new GroupFragment();
     }
 
     public GroupFragment() {}
@@ -103,6 +108,7 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onResume();
 
         EventBus.getDefault().register(this);
+
         getLoaderManager().initLoader(GROUPS_LOADER_ID, null, this);
     }
 
@@ -120,12 +126,9 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final Uri GROUPS_URI = ContactsContract.Groups.CONTENT_URI;
     private static final String[] GROUPS_PROJECTION = new String[] {
             ContactsContract.Groups._ID,
-            ContactsContract.Groups.ACCOUNT_TYPE,
-            ContactsContract.Groups.ACCOUNT_NAME,
+            ContactsContract.Groups.SOURCE_ID,
             ContactsContract.Groups.TITLE};
-    private static final String GROUPS_SELECTION =
-            ContactsContract.Groups.DELETED + " = 0 AND " +
-            ContactsContract.Groups.GROUP_VISIBLE + " = 1";
+    private static final String GROUPS_SELECTION = ContactsContract.Groups.DELETED + " = 0";
 
     private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
 
@@ -142,9 +145,10 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public synchronized void onLoaderReset(Loader<Cursor> loader) {
+        mVisibleGroups.clear();
         mGroups.clear();
         mGroupsById.clear();
-        mAdapter.setData(mGroups);
+        mAdapter.setData(mVisibleGroups);
     }
 
     @Override
@@ -168,17 +172,14 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
                     Log.e("1gravity", "group " + group.getId() + ": " + group.getDisplayName());
 
-                    String ACCOUNT_TYPE = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.ACCOUNT_TYPE));
-                    String ACCOUNT_NAME = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.ACCOUNT_NAME));
-                    Log.e("1gravity", "ACCOUNT_TYPE " + ACCOUNT_TYPE);
-                    Log.e("1gravity", "ACCOUNT_NAME " + ACCOUNT_NAME);
+                    String SOURCE_ID = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.SOURCE_ID));
+                    Log.e("1gravity", "SOURCE_ID: " + SOURCE_ID);
                 }
             }
 
-            GroupsLoaded.post( mGroups );
+            mAdapter.setData(mVisibleGroups);
 
-            mAdapter.setData(mGroups);
-            if (mContacts != null && !mContacts.isEmpty()) {
+            if (mContacts != null && ! mContacts.isEmpty()) {
                 processContacts(mContacts);
             }
         }
@@ -186,19 +187,23 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
     // ****************************************** Misc Methods *******************************************
 
-    List<? extends Contact> mContacts;
-
     private void processContacts(List<? extends Contact> contacts) {
-        List<Integer> mGroupsChanged = new ArrayList<>();
         for (Contact contact : contacts) {
             for (Long groupId : contact.getGroupIds()) {
                 GroupImpl group = mGroupsById.get(groupId);
                 if (group != null) {
+                    Log.e("1gravity", group.getDisplayName() + " --> "  + contact.getDisplayName());
                     group.addContact(contact);
                 }
             }
         }
 
+        mVisibleGroups.clear();
+        for (GroupImpl group : mGroups) {
+            if (group.hasContacts()) {
+                mVisibleGroups.add(group);
+            }
+        }
         mAdapter.notifyDataSetChanged();
     }
 

@@ -19,7 +19,7 @@ package com.onegravity.contactpicker.group;
 import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.contact.Contact;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * This interface describes a group contact.
@@ -28,6 +28,6 @@ import java.util.Set;
  */
 public interface Group extends ContactElement {
 
-	Set<Contact> getContacts();
+	Collection<Contact> getContacts();
 
 }

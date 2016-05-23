@@ -25,9 +25,10 @@ import com.onegravity.contactpicker.OnContactsCheckedListener;
 import com.onegravity.contactpicker.contact.Contact;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * GroupImpl is the concrete Group implementation.
@@ -42,18 +43,17 @@ class GroupImpl extends ContactElementImpl implements Group {
 		return new GroupImpl(id, title);
 	}
 
-	private static Set<Contact> mContacts;
+    private Map<Long, Contact> mContacts = new HashMap<>();
 
 	private GroupImpl(long id, String displayName) {
 		super(id, displayName);
-		mContacts = new HashSet<>();
 	}
 
     @Override
     protected void notifyOnContactsCheckedListener(OnContactsCheckedListener listener,
                                                    boolean wasChecked, boolean isChecked) {
         List<ContactElement> changedContacts = new ArrayList<>();
-        for (Contact contact : mContacts) {
+        for (Contact contact : mContacts.values()) {
             if (contact.isChecked() != isChecked) {
                 changedContacts.add(contact);
                 // TODO: 5/17/16 we need to make sure the change isn't notified by each contact
@@ -65,12 +65,19 @@ class GroupImpl extends ContactElementImpl implements Group {
     }
 
 	@Override
-	public Set<Contact> getContacts() {
-		return mContacts;
+	public Collection<Contact> getContacts() {
+		return mContacts.values();
 	}
 
     void addContact(Contact contact) {
-        mContacts.add(contact);
+        long contactId = contact.getId();
+        if (! mContacts.keySet().contains(contactId)) {
+            mContacts.put(contact.getId(), contact);
+        }
+    }
+
+    boolean hasContacts() {
+        return mContacts.size() > 0;
     }
 
 }

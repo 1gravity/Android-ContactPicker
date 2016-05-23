@@ -38,12 +38,6 @@ import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.ContactsCheckedEvent;
 import com.onegravity.contactpicker.OnContactsCheckedListener;
 import com.onegravity.contactpicker.R;
-import com.onegravity.contactpicker.group.Group;
-import com.onegravity.contactpicker.group.GroupsLoaded;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,10 +74,7 @@ public class ContactFragment extends Fragment implements
      * Fragment for opening the message list for a "real" account/folder
      */
     public static ContactFragment newInstance() {
-        ContactFragment frag = new ContactFragment();
-        Bundle args = new Bundle();
-        frag.setArguments(args);
-        return frag;
+        return new ContactFragment();
     }
 
     public ContactFragment() {}
@@ -159,15 +150,7 @@ public class ContactFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        EventBus.getDefault().register(this);
         getLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        EventBus.getDefault().unregister(this);
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -188,7 +171,6 @@ public class ContactFragment extends Fragment implements
     private static final String[] CONTACT_DETAILS_PROJECTION = {
             ContactsContract.Data.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Contacts.PHOTO_URI,
             ContactsContract.Data.MIMETYPE,
             ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
             ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
@@ -256,7 +238,7 @@ public class ContactFragment extends Fragment implements
                 contact.setOnContactCheckedListener(this);
 
                 Log.e("1gravity", "lookupKey: " + lookupKey);
-//                Log.e("1gravity", "id: " + contact.getId());
+                Log.e("1gravity", "id: " + contact.getId());
                 Log.e("1gravity", "displayName: " + contact.getDisplayName());
                 Log.e("1gravity", "first name: " + contact.getFirstName());
                 Log.e("1gravity", "last name: " + contact.getLastName());
@@ -281,7 +263,7 @@ public class ContactFragment extends Fragment implements
             while (cursor.moveToNext()) {
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.LOOKUP_KEY));
 
-                Log.e("1gravity", "lookupKey: " + lookupKey);
+                //Log.e("1gravity", "lookupKey: " + lookupKey);
                 ContactImpl contact = mContactsByLookupKey.get(lookupKey);
                 if (contact != null) {
                     updateContact(cursor, contact);
@@ -332,8 +314,8 @@ public class ContactFragment extends Fragment implements
         else if (mime.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
             String firstName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
             String lastName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
-            contact.setFirstName(firstName);
-            contact.setLastName(lastName);
+            if (firstName != null) contact.setFirstName(firstName);
+            if (lastName != null) contact.setLastName(lastName);
             Log.e("1gravity", "  first name: "  + firstName);
             Log.e("1gravity", "  last name: "  + lastName);
         }
@@ -364,16 +346,6 @@ public class ContactFragment extends Fragment implements
     }
 
     // ****************************************** Misc Methods *******************************************
-
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(GroupsLoaded event) {
-        EventBus.getDefault().removeStickyEvent(event);
-
-        for (Group group : event.getGroups()) {
-            long groupId = group.getId();
-
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
