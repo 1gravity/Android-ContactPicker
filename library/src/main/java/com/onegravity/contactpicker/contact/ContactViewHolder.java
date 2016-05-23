@@ -95,11 +95,12 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         }
 
         // check box
+        mSelect.setOnCheckedChangeListener(null);
         mSelect.setChecked( contact.isChecked() );
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                contact.setChecked(isChecked);
+                contact.setChecked(isChecked, false);
             }
         });
     }

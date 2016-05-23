@@ -34,10 +34,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.ContactsCheckedEvent;
-import com.onegravity.contactpicker.OnContactsCheckedListener;
+import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.group.Group;
+import com.onegravity.contactpicker.group.GroupsLoaded;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,9 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ContactFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor>,
-        OnContactsCheckedListener {
+public class ContactFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private TreeMap<Integer, Bundle> mLoaderIds;
 
@@ -57,8 +60,11 @@ public class ContactFragment extends Fragment implements
      */
     private List<ContactImpl> mContacts = new ArrayList<>();
 
+    // store the groups in case the contacts haven't been loaded yet
+    private List<? extends Group> mGroups;
+
     /*
-     * Mao of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
+     * Map of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
      */
     private Map<String, ContactImpl> mContactsByLookupKey = new HashMap<>();
 
@@ -150,7 +156,16 @@ public class ContactFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
+        EventBus.getDefault().register(this);
+
         getLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        EventBus.getDefault().unregister(this);
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -217,6 +232,10 @@ public class ContactFragment extends Fragment implements
                 break;
             case CONTACT_DETAILS_LOADER_ID:
                 readContactDetails(cursor);
+
+                if (mGroups != null && ! mGroups.isEmpty()) {
+                    processGroups(mGroups);
+                }
                 break;
         }
     }
@@ -235,7 +254,7 @@ public class ContactFragment extends Fragment implements
 
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                 mContactsByLookupKey.put(lookupKey, contact);
-                contact.setOnContactCheckedListener(this);
+                contact.addOnContactCheckedListener(mContactListener);
 
                 Log.e("1gravity", "lookupKey: " + lookupKey);
                 Log.e("1gravity", "id: " + contact.getId());
@@ -326,13 +345,51 @@ public class ContactFragment extends Fragment implements
         }
     }
 
-    @Override
-    public void onContactChecked(ContactElement contact, boolean wasChecked, boolean isChecked) {
-        onContactsChecked(Collections.singletonList(contact), wasChecked, isChecked);
+    // ****************************************** Process Contacts / Groups *******************************************
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(GroupsLoaded event) {
+        EventBus.getDefault().removeStickyEvent(event);
+
+        if (mContacts.isEmpty()) {
+            mGroups = event.getGroups();
+        }
+        else {
+            processGroups(event.getGroups());
+        }
     }
 
-    @Override
-    public void onContactsChecked(List<ContactElement> contacts, boolean wasChecked, boolean isChecked) {
+    private void processGroups(List<? extends Group> groups) {
+        for (Group group : groups) {
+            group.addOnContactCheckedListener(mGroupListener);
+        }
+    }
+
+    private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
+        @Override
+        public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
+            List<Contact> contacts = new ArrayList<>();
+            for (Contact contact : group.getContacts()) {
+                if (contact.isChecked() != isChecked) {
+                    contact.setChecked(isChecked, true);
+                    contacts.add(contact);
+                }
+            }
+
+            onContactsChecked(contacts, wasChecked, isChecked);
+
+            mAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
+        @Override
+        public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
+            onContactsChecked(Collections.singletonList(contact), wasChecked, isChecked);
+        }
+    };
+
+    private void onContactsChecked(List<Contact> contacts, boolean wasChecked, boolean isChecked) {
         if (wasChecked != isChecked) {
             int nrOfContacts = contacts.size();
             if (isChecked) {
@@ -345,13 +402,29 @@ public class ContactFragment extends Fragment implements
         }
     }
 
-    // ****************************************** Misc Methods *******************************************
+    // ****************************************** Option Menu *******************************************
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        // TODO: 5/16/2016
-        return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        if( id == R.id.menu_check_all) {
+            checkAll();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void checkAll() {
+        // if all are checked then un-check the contacts, otherwise check them all
+        boolean isChecked = mSelectedContacts < mContacts.size();
+        for (Contact contact : mContacts) {
+            if (contact.isChecked() != isChecked) {
+                contact.setChecked(isChecked, false);
+            }
+        }
+
+        mAdapter.notifyDataSetChanged();
     }
 
     public List<Contact> getSelectedContacts() {

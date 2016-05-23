@@ -16,6 +16,9 @@
 
 package com.onegravity.contactpicker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The concrete but abstract implementation of ContactElement.
  */
@@ -24,7 +27,7 @@ public abstract class ContactElementImpl implements ContactElement {
 	final private long mId;
 	final private String mDisplayName;
 
-	transient private OnContactsCheckedListener mListener;
+	transient private List<OnContactCheckedListener> mListeners = new ArrayList<>();
 	transient private boolean mChecked = false;
 
 	public ContactElementImpl(long id, String displayName) {
@@ -48,20 +51,19 @@ public abstract class ContactElementImpl implements ContactElement {
 	}
 
 	@Override
-	public void setChecked(boolean checked) {
+	public void setChecked(boolean checked, boolean suppressListenerCall) {
 		boolean wasChecked = mChecked;
 		mChecked = checked;
-		if (mListener != null && wasChecked != checked) {
-            notifyOnContactsCheckedListener(mListener, wasChecked, checked);
+		if (! mListeners.isEmpty() && wasChecked != checked && ! suppressListenerCall) {
+            for (OnContactCheckedListener listener : mListeners) {
+                listener.onContactChecked(this, wasChecked, checked);
+            }
 		}
 	}
 
-    protected abstract void notifyOnContactsCheckedListener(OnContactsCheckedListener listener,
-                                                            boolean wasChecked, boolean isChecked);
-
     @Override
-    public void setOnContactCheckedListener(OnContactsCheckedListener listener) {
-        mListener = listener;
+    public void addOnContactCheckedListener(OnContactCheckedListener listener) {
+        mListeners.add(listener);
     }
 
 	@Override

@@ -14,24 +14,33 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker;
+package com.onegravity.contactpicker.group;
 
-import java.io.Serializable;
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.List;
 
 /**
- * A ContactElement (single contact or group) always has a unique id and a display name.
- * It also can be checked/unchecked and can be observer by attaching an OnContactCheckedListener.
+ * All groups have been loaded.
+ *
+ * Publisher: GroupFragment
+ * Subscriber: ContactFragment
  */
-public interface ContactElement extends Serializable {
+public class GroupsLoaded {
 
-	long getId();
+	public static void post(List<? extends Group> groups) {
+		GroupsLoaded event = new GroupsLoaded(groups);
+		EventBus.getDefault().postSticky( event );
+	}
 
-	String getDisplayName();
+	final private List<? extends Group> mGroups;
 
-    boolean isChecked();
+	private GroupsLoaded(List<? extends Group> groups) {
+		mGroups = groups;
+	}
 
-	void setChecked(boolean checked, boolean suppressListenerCall);
-
-    void addOnContactCheckedListener(OnContactCheckedListener listener);
+	public List<? extends Group> getGroups() {
+		return mGroups;
+	}
 
 }

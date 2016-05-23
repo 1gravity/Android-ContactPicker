@@ -21,7 +21,7 @@ import android.provider.ContactsContract;
 
 import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.ContactElementImpl;
-import com.onegravity.contactpicker.OnContactsCheckedListener;
+import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.contact.Contact;
 
 import java.util.ArrayList;
@@ -48,21 +48,6 @@ class GroupImpl extends ContactElementImpl implements Group {
 	private GroupImpl(long id, String displayName) {
 		super(id, displayName);
 	}
-
-    @Override
-    protected void notifyOnContactsCheckedListener(OnContactsCheckedListener listener,
-                                                   boolean wasChecked, boolean isChecked) {
-        List<ContactElement> changedContacts = new ArrayList<>();
-        for (Contact contact : mContacts.values()) {
-            if (contact.isChecked() != isChecked) {
-                changedContacts.add(contact);
-                // TODO: 5/17/16 we need to make sure the change isn't notified by each contact
-                contact.setChecked(isChecked);
-            }
-        }
-
-        listener.onContactsChecked(changedContacts, wasChecked, isChecked);
-    }
 
 	@Override
 	public Collection<Contact> getContacts() {

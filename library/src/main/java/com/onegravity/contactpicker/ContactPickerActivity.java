@@ -88,8 +88,6 @@ public class ContactPickerActivity extends AppCompatActivity {
 
     private PagerAdapter mAdapter;
 
-    private boolean mAllChecked;
-
     private String mDefaultTitle;
 
     // ****************************************** Lifecycle Methods *******************************************
@@ -241,7 +239,6 @@ public class ContactPickerActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean("mAllChecked", mAllChecked);
         outState.putString("mDefaultTitle", mDefaultTitle);
     }
 
@@ -280,10 +277,6 @@ public class ContactPickerActivity extends AppCompatActivity {
             onSearch(item);
             return true;
         }
-        else if( id == R.id.menu_check_all) {
-            onCheckAll();
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -302,12 +295,6 @@ public class ContactPickerActivity extends AppCompatActivity {
         }
 
         finish();
-    }
-
-    private void onCheckAll() {
-        //Check or uncheck all
-        mAllChecked = !mAllChecked;
-        //mAdapter.checkAll(mAllChecked);
     }
 
     @SuppressLint("InlinedApi")

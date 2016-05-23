@@ -44,7 +44,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         mDescription = (TextView) root.findViewById(R.id.description);
     }
 
-    void bind(final Group group) {
+    void bind(final GroupImpl group) {
         mRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,11 +62,12 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         mDescription.setText(desc);
 
         // check box
+        mSelect.setOnCheckedChangeListener(null);
         mSelect.setChecked( group.isChecked() );
         mSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                group.setChecked(isChecked);
+                group.setChecked(isChecked, false);
             }
         });
 

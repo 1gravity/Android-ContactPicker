@@ -29,19 +29,19 @@ import java.util.Set;
  */
 public interface Contact extends ContactElement {
 
-	public String getFirstName();
+	String getFirstName();
 
-	public String getLastName();
+	String getLastName();
 
-	public String getEmail();
+	String getEmail();
 
-	public String getPhone();
+	String getPhone();
 
-	public String getAddress();
+	String getAddress();
 
-	public String getKey();
+	String getKey();
 
-	public Uri getPhotoUri();
+	Uri getPhotoUri();
 
-    public Set<Long> getGroupIds();
+    Set<Long> getGroupIds();
 }

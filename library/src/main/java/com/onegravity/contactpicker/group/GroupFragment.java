@@ -32,6 +32,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
@@ -177,6 +178,8 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
                 }
             }
 
+            GroupsLoaded.post(mGroups);
+
             mAdapter.setData(mVisibleGroups);
 
             if (mContacts != null && ! mContacts.isEmpty()) {
@@ -185,27 +188,7 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
         }
     }
 
-    // ****************************************** Misc Methods *******************************************
-
-    private void processContacts(List<? extends Contact> contacts) {
-        for (Contact contact : contacts) {
-            for (Long groupId : contact.getGroupIds()) {
-                GroupImpl group = mGroupsById.get(groupId);
-                if (group != null) {
-                    Log.e("1gravity", group.getDisplayName() + " --> "  + contact.getDisplayName());
-                    group.addContact(contact);
-                }
-            }
-        }
-
-        mVisibleGroups.clear();
-        for (GroupImpl group : mGroups) {
-            if (group.hasContacts()) {
-                mVisibleGroups.add(group);
-            }
-        }
-        mAdapter.notifyDataSetChanged();
-    }
+    // ****************************************** Process Contacts / Groups *******************************************
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactsLoaded event) {
@@ -218,10 +201,98 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
         }
     }
 
+    private void processContacts(List<? extends Contact> contacts) {
+        // map contacts to groups
+        for (Contact contact : contacts) {
+            for (Long groupId : contact.getGroupIds()) {
+                GroupImpl group = mGroupsById.get(groupId);
+                if (group != null) {
+                    group.addContact(contact);
+                    contact.addOnContactCheckedListener(mContactListener);
+                }
+            }
+        }
+
+        // determine visible groups (the ones with at least one contact)
+        mVisibleGroups.clear();
+        for (GroupImpl group : mGroups) {
+            if (group.hasContacts()) {
+                mVisibleGroups.add(group);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Listening to onContactChecked for contacts because we want to check/uncheck groups based on
+     * whether their contacts are all checked or unchecked.
+     */
+    private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
+        @Override
+        public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
+            boolean hasChanged = false;
+
+            for (Long groupId : contact.getGroupIds()) {
+                GroupImpl group = mGroupsById.get(groupId);
+                if (group != null) {
+                    // let's see if the contacts of the group are either all selected or unselected
+                    int count = 0;
+                    for (Contact groupContact : group.getContacts()) {
+                        if (groupContact.isChecked()) {
+                            count++;
+                        }
+                    }
+                    if (count == group.getContacts().size()) {
+                        // all selected
+                        group.setChecked(true, true);
+                        hasChanged = true;
+                    }
+                    else if (count == 0) {
+                        // all unselected
+                        group.setChecked(false, true);
+                        hasChanged = true;
+                    }
+                }
+            }
+
+            if (hasChanged) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
+
+    // ****************************************** Option Menu *******************************************
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        return true;	// don't call super.onOptionsItemSelected because we got some StackOverflowErrors on Honeycomb
+        int id = item.getItemId();
+        if( id == R.id.menu_check_all) {
+            checkAll();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void checkAll() {
+        // determine if all groups are checked
+        boolean allChecked = true;
+        for (Group group : mGroups) {
+            if (! group.isChecked()) {
+                allChecked = false;
+                break;
+            }
+        }
+
+        // if all are checked then un-check the groups, otherwise check them all
+        boolean isChecked = ! allChecked;
+        for (Group group : mGroups) {
+            if (group.isChecked() != isChecked) {
+                group.setChecked(isChecked, false);
+            }
+        }
+
+        mAdapter.notifyDataSetChanged();
     }
 
 }

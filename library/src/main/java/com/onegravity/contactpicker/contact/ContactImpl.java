@@ -22,7 +22,6 @@ import android.provider.ContactsContract;
 
 import com.onegravity.contactpicker.ContactElementImpl;
 import com.onegravity.contactpicker.Helper;
-import com.onegravity.contactpicker.OnContactsCheckedListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -122,12 +121,6 @@ class ContactImpl extends ContactElementImpl implements Contact {
 
 	void addGroupId(long value) {
 		mGroupIds.add(value);
-	}
-
-	@Override
-	protected void notifyOnContactsCheckedListener(OnContactsCheckedListener listener,
-												   boolean wasChecked, boolean isChecked) {
-		listener.onContactChecked(this, wasChecked, isChecked);
 	}
 
 	@Override
