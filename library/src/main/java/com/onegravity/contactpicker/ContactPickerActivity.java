@@ -243,7 +243,7 @@ public class ContactPickerActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(ContactsCheckedEvent event) {
+    public void onEventMainThread(UpdateTitle event) {
         int nrOfContacts = event.getNrOfContacts();
         if (nrOfContacts == 0) {
             setTitle(mDefaultTitle);

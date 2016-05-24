@@ -19,27 +19,17 @@ package com.onegravity.contactpicker;
 import org.greenrobot.eventbus.EventBus;
 
 /**
- * A contact or group has been checked
- * -> update title by sending the total number of selected contacts.
+ * The selection has changed (contacts, groups) and we need to recalculate the number of selected
+ * contacts/groups and take according action.
  *
  * Publisher: ContactFragment, GroupFragment
- * Subscriber: ContactPickerActivity
+ * Subscriber: ContactFragment, GroupFragment
  */
-public class ContactsCheckedEvent {
+public class SelectionChanged {
 
-	public static void post(int nrOfContacts) {
-		ContactsCheckedEvent event = new ContactsCheckedEvent(nrOfContacts);
-		EventBus.getDefault().post( event );
-	}
-
-	final private int mNrOfContacts;
-
-	private ContactsCheckedEvent(int nrOfContacts) {
-		mNrOfContacts = nrOfContacts;
-	}
-
-	public int getNrOfContacts() {
-		return mNrOfContacts;
+	private static final SelectionChanged sEvent = new SelectionChanged();
+	public static void post() {
+		EventBus.getDefault().post( sEvent );
 	}
 
 }

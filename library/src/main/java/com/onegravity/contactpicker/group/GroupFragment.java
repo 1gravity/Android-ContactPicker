@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.SelectionChanged;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
 
@@ -43,6 +44,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +58,13 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
     // groups by id to find them once the contacts are loaded
     private Map<Long, GroupImpl> mGroupsById = new HashMap<>();
+
+    /*
+     * The selected ids are put into the Bundle in onSaveInstanceState, restored in onCreate and
+     * then applied to the contacts once they are loaded in onLoadFinished.
+     */
+    private static final String GROUP_IDS = "GROUP_IDS";
+    private HashSet<Long> mSelectedIds = new HashSet<>();
 
     // store the contacts in case the groups haven't been loaded yet
     private List<? extends Contact> mContacts;
@@ -75,11 +84,27 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+
+        // some devices don't retain fragments
+        if (savedInstanceState != null) {
+            try {
+                mSelectedIds = (HashSet<Long>) savedInstanceState.getSerializable(GROUP_IDS);
+            }
+            catch (ClassCastException ignore) {}
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        mSelectedIds.clear();;
+        for (Group group : mGroups) {
+            if (group.isChecked()) {
+                mSelectedIds.add( group.getId() );
+            }
+        }
+        outState.putSerializable(GROUP_IDS, mSelectedIds);
     }
 
     @Override
@@ -108,8 +133,8 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onResume() {
         super.onResume();
 
+        clearData();
         EventBus.getDefault().register(this);
-
         getLoaderManager().initLoader(GROUPS_LOADER_ID, null, this);
     }
 
@@ -118,6 +143,7 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onPause();
 
         EventBus.getDefault().unregister(this);
+        clearData();
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -133,12 +159,6 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
 
-    /**
-     * The loader id is -1  for the folder list (group cursor) and the the group cursor position
-     * (0, 1, ...) for the sudokus (children).
-     *
-     * The folder id for querying the Sudoku puzzles is passed in the Bundle
-     */
     @Override
     public synchronized Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), GROUPS_URI, GROUPS_PROJECTION, GROUPS_SELECTION, null, GROUPS_SORT);
@@ -146,45 +166,51 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public synchronized void onLoaderReset(Loader<Cursor> loader) {
-        mVisibleGroups.clear();
-        mGroups.clear();
-        mGroupsById.clear();
+        clearData();
         mAdapter.setData(mVisibleGroups);
     }
 
     @Override
     public synchronized void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (mAdapter != null && cursor != null && ! cursor.isClosed()) {
-            mGroups.clear();
+        clearData();
+        readGroups(cursor);
+    }
 
-            Log.e("1gravity", "***************************************************************");
-            Log.e("1gravity", "* GROUPS                                                      *");
-            Log.e("1gravity", "***************************************************************");
+    private void clearData() {
+        mVisibleGroups.clear();
+        mGroups.clear();
+        mGroupsById.clear();
+    }
 
-            if (cursor.moveToFirst()) {
-                cursor.moveToPrevious();
-                while (cursor.moveToNext()) {
-                    GroupImpl group = GroupImpl.fromCursor(cursor);
+    private void readGroups(Cursor cursor) {
+        Log.e("1gravity", "***************************************************************");
+        Log.e("1gravity", "* GROUPS                                                      *");
+        Log.e("1gravity", "***************************************************************");
 
-                    // TODO: 5/11/2016 deal with duplicates...
+        if (cursor.moveToFirst()) {
+            cursor.moveToPrevious();
+            while (cursor.moveToNext()) {
+                GroupImpl group = GroupImpl.fromCursor(cursor);
 
-                    mGroups.add(group);
-                    mGroupsById.put(group.getId(), group);
+                mGroups.add(group);
+                mGroupsById.put(group.getId(), group);
 
-                    Log.e("1gravity", "group " + group.getId() + ": " + group.getDisplayName());
+                boolean isChecked = mSelectedIds.contains(group.getId());
+                group.setChecked(isChecked, true);
 
-                    String SOURCE_ID = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.SOURCE_ID));
-                    Log.e("1gravity", "SOURCE_ID: " + SOURCE_ID);
-                }
+                Log.e("1gravity", "group " + group.getId() + ": " + group.getDisplayName());
+                String SOURCE_ID = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.SOURCE_ID));
+                Log.e("1gravity", "SOURCE_ID: " + SOURCE_ID);
             }
+        }
+        mSelectedIds.clear();
 
-            GroupsLoaded.post(mGroups);
+        GroupsLoaded.post(mGroups);
 
-            mAdapter.setData(mVisibleGroups);
+        mAdapter.setData(mVisibleGroups);
 
-            if (mContacts != null && ! mContacts.isEmpty()) {
-                processContacts(mContacts);
-            }
+        if (mContacts != null && ! mContacts.isEmpty()) {
+            processContacts(mContacts);
         }
     }
 
@@ -193,15 +219,30 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactsLoaded event) {
         EventBus.getDefault().removeStickyEvent(event);
-        if (mGroups.isEmpty()) {
-            mContacts = event.getContacts();
-        }
-        else {
-            processContacts(event.getContacts());
+        mContacts = event.getContacts();
+        if (! mGroups.isEmpty()) {
+            processContacts( mContacts );
         }
     }
 
-    private void processContacts(List<? extends Contact> contacts) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(SelectionChanged event) {
+        if (! mGroups.isEmpty()) {
+            boolean hasChanged = false;
+
+            for (Group group : mGroups) {
+                if (deselectGroup(group)) {
+                    hasChanged = true;
+                }
+            }
+
+            if (hasChanged) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private synchronized void processContacts(List<? extends Contact> contacts) {
         // map contacts to groups
         for (Contact contact : contacts) {
             for (Long groupId : contact.getGroupIds()) {
@@ -224,7 +265,7 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     /**
-     * Listening to onContactChecked for contacts because we want to check/uncheck groups based on
+     * Listening to onContactChecked for contacts because we want to check/un-check groups based on
      * whether their contacts are all checked or unchecked.
      */
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
@@ -234,24 +275,8 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
 
             for (Long groupId : contact.getGroupIds()) {
                 GroupImpl group = mGroupsById.get(groupId);
-                if (group != null) {
-                    // let's see if the contacts of the group are either all selected or unselected
-                    int count = 0;
-                    for (Contact groupContact : group.getContacts()) {
-                        if (groupContact.isChecked()) {
-                            count++;
-                        }
-                    }
-                    if (count == group.getContacts().size()) {
-                        // all selected
-                        group.setChecked(true, true);
-                        hasChanged = true;
-                    }
-                    else if (count == 0) {
-                        // all unselected
-                        group.setChecked(false, true);
-                        hasChanged = true;
-                    }
+                if (deselectGroup(group)) {
+                    hasChanged = true;
                 }
             }
 
@@ -260,6 +285,26 @@ public class GroupFragment extends Fragment implements LoaderManager.LoaderCallb
             }
         }
     };
+
+    private boolean deselectGroup(Group group) {
+        if (group != null) {
+            // let's see if the contacts of the group are either all deselected
+            boolean isSelected = false;
+            for (Contact groupContact : group.getContacts()) {
+                if (groupContact.isChecked()) {
+                    isSelected = true;
+                    break;
+                }
+            }
+            if (! isSelected && group.isChecked()) {
+                // all deselected
+                group.setChecked(false, true);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // ****************************************** Option Menu *******************************************
 

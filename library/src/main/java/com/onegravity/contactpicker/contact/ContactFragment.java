@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -34,7 +33,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.onegravity.contactpicker.ContactsCheckedEvent;
+import com.onegravity.contactpicker.SelectionChanged;
+import com.onegravity.contactpicker.UpdateTitle;
 import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.group.Group;
@@ -45,23 +45,24 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class ContactFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private TreeMap<Integer, Bundle> mLoaderIds;
 
     /*
      * List of all contacts.
      */
     private List<ContactImpl> mContacts = new ArrayList<>();
 
-    // store the groups in case the contacts haven't been loaded yet
-    private List<? extends Group> mGroups;
+    /*
+     * The selected ids are put into the Bundle in onSaveInstanceState, restored in onCreate and
+     * then applied to the contacts once they are loaded in onLoadFinished.
+     */
+    private static final String CONTACT_IDS = "CONTACT_IDS";
+    private HashSet<Long> mSelectedIds = new HashSet<>();
 
     /*
      * Map of all contacts by lookup key (ContactsContract.Contacts.LOOKUP_KEY).
@@ -72,6 +73,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
 
     private ContactAdapter mAdapter;
 
+    // update the adapter after a certain amount of contacts has loaded
     private static final int BATCH_SIZE = 25;
 
     // ****************************************** Lifecycle Methods *******************************************
@@ -90,14 +92,13 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-        if (savedInstanceState != null) {
-            // some devices don't seem to retain the fragment even with
-            // setRetainInstance(true) so we have to do this the "old fashioned" way
-            restoreInstanceState(savedInstanceState);
-        }
 
-        if (mLoaderIds == null) {
-            mLoaderIds = new TreeMap<>();
+        // some devices don't retain fragments
+        if (savedInstanceState != null) {
+            try {
+                mSelectedIds = (HashSet<Long>) savedInstanceState.getSerializable(CONTACT_IDS);
+            }
+            catch (ClassCastException ignore) {}
         }
     }
 
@@ -105,28 +106,13 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        saveLoaderParams(outState, "mLoaderIds", mLoaderIds);
-    }
-
-    private void saveLoaderParams(Bundle outState, String key, Map<Integer, ? extends Parcelable> params) {
-        Map<Integer, ? extends Parcelable> loaderIds = new HashMap<>(params);
-        ArrayList<Integer> tmp = new ArrayList<>();
-        tmp.addAll(loaderIds.keySet());
-        outState.putIntegerArrayList(key, tmp);
-        for (int loaderId : tmp) {
-            Parcelable p = loaderIds.get(loaderId);
-            outState.putParcelable(key + loaderId, p);
+        mSelectedIds.clear();;
+        for (Contact contact : mContacts) {
+            if (contact.isChecked()) {
+                mSelectedIds.add( contact.getId() );
+            }
         }
-    }
-
-    private void restoreInstanceState(Bundle state) {
-        // restore mLoaderIds
-        mLoaderIds = new TreeMap<>();
-        ArrayList<Integer> tmp = state.getIntegerArrayList("mLoaderIds");
-        for (int loaderId : tmp) {
-            Bundle bundle = state.getParcelable("mLoaderIds" + loaderId);
-            mLoaderIds.put(loaderId, bundle);
-        }
+        outState.putSerializable(CONTACT_IDS, mSelectedIds);
     }
 
     @Override
@@ -156,8 +142,8 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
     public void onResume() {
         super.onResume();
 
+        clearData();
         EventBus.getDefault().register(this);
-
         getLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
     }
 
@@ -166,6 +152,7 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         super.onPause();
 
         EventBus.getDefault().unregister(this);
+        clearData();
     }
 
     // ****************************************** Loader Methods *******************************************
@@ -218,8 +205,6 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mContacts.clear();
-        mContactsByLookupKey.clear();
         mAdapter.setData(mContacts);
     }
 
@@ -227,17 +212,19 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         switch(loader.getId()) {
             case CONTACTS_LOADER_ID:
+                clearData();
                 readContacts(cursor);
                 getLoaderManager().initLoader(CONTACT_DETAILS_LOADER_ID, null, this);
                 break;
             case CONTACT_DETAILS_LOADER_ID:
                 readContactDetails(cursor);
-
-                if (mGroups != null && ! mGroups.isEmpty()) {
-                    processGroups(mGroups);
-                }
                 break;
         }
+    }
+
+    private void clearData() {
+        mContacts.clear();
+        mContactsByLookupKey.clear();
     }
 
     private void readContacts(Cursor cursor) {
@@ -245,6 +232,8 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         Log.e("1gravity", "* CONTACTS                                                    *");
         Log.e("1gravity", "***************************************************************");
 
+        mSelectedContacts = 0;
+        int selectedContacts = 0;
         if (cursor.moveToFirst()) {
             cursor.moveToPrevious();
             int count = 0;
@@ -254,6 +243,11 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
 
                 String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                 mContactsByLookupKey.put(lookupKey, contact);
+
+                boolean isChecked = mSelectedIds.contains(contact.getId());
+                if (isChecked) mSelectedContacts++;
+                contact.setChecked(isChecked, true);
+
                 contact.addOnContactCheckedListener(mContactListener);
 
                 Log.e("1gravity", "lookupKey: " + lookupKey);
@@ -265,9 +259,15 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
 
                 if (++count >= BATCH_SIZE) {
                     mAdapter.setData(mContacts);
+                    if (mSelectedContacts > selectedContacts) {
+                        UpdateTitle.post(mSelectedContacts);
+                        selectedContacts = mSelectedContacts;
+                    }
                 }
             }
         }
+
+        mSelectedIds.clear();
 
         mAdapter.setData(mContacts);
     }
@@ -351,56 +351,52 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
     public void onEventMainThread(GroupsLoaded event) {
         EventBus.getDefault().removeStickyEvent(event);
 
-        if (mContacts.isEmpty()) {
-            mGroups = event.getGroups();
-        }
-        else {
-            processGroups(event.getGroups());
+        // add a listener to each group
+        for (Group group : event.getGroups()) {
+            group.addOnContactCheckedListener(mGroupListener);
         }
     }
 
-    private void processGroups(List<? extends Group> groups) {
-        for (Group group : groups) {
-            group.addOnContactCheckedListener(mGroupListener);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(SelectionChanged event) {
+        mSelectedContacts = 0;
+        for (Contact contact : mContacts) {
+            if (contact.isChecked()) {
+                mSelectedContacts++;
+            }
         }
+
+        mAdapter.notifyDataSetChanged();
+        UpdateTitle.post(mSelectedContacts);
     }
 
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            List<Contact> contacts = new ArrayList<>();
             for (Contact contact : group.getContacts()) {
                 if (contact.isChecked() != isChecked) {
                     contact.setChecked(isChecked, true);
-                    contacts.add(contact);
                 }
             }
 
-            onContactsChecked(contacts, wasChecked, isChecked);
-
-            mAdapter.notifyDataSetChanged();
+            SelectionChanged.post();
         }
     };
 
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            onContactsChecked(Collections.singletonList(contact), wasChecked, isChecked);
+            if (wasChecked != isChecked) {
+                if (isChecked) {
+                    mSelectedContacts =  Math.min(mContacts.size(), mSelectedContacts + 1);
+                }
+                else {
+                    mSelectedContacts = Math.max(0, mSelectedContacts - 1);
+                }
+                UpdateTitle.post(mSelectedContacts);
+            }
         }
     };
-
-    private void onContactsChecked(List<Contact> contacts, boolean wasChecked, boolean isChecked) {
-        if (wasChecked != isChecked) {
-            int nrOfContacts = contacts.size();
-            if (isChecked) {
-                mSelectedContacts =  Math.min(mContacts.size(), mSelectedContacts + nrOfContacts);
-            }
-            else {
-                mSelectedContacts = Math.max(0, mSelectedContacts - nrOfContacts);
-            }
-            ContactsCheckedEvent.post(mSelectedContacts);
-        }
-    }
 
     // ****************************************** Option Menu *******************************************
 
@@ -420,11 +416,12 @@ public class ContactFragment extends Fragment implements LoaderManager.LoaderCal
         boolean isChecked = mSelectedContacts < mContacts.size();
         for (Contact contact : mContacts) {
             if (contact.isChecked() != isChecked) {
-                contact.setChecked(isChecked, false);
+                contact.setChecked(isChecked, true);
             }
         }
 
         mAdapter.notifyDataSetChanged();
+        SelectionChanged.post();
     }
 
     public List<Contact> getSelectedContacts() {
