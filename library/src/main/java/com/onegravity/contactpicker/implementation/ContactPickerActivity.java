@@ -65,6 +65,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -250,14 +251,6 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
         public int getCount() {
             return mNumOfTabs;
         }
-
-        ContactFragment getContactFragment() {
-            return mContactFragment;
-        }
-
-        GroupFragment getGroupFragment() {
-            return mGroupFragment;
-        }
     }
 
     @Override
@@ -340,17 +333,18 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
 
     private void onDone() {
         // return only checked contacts
-//        ContactFragment fragment = mAdapter.getContactFragment();
-//        if (fragment != null) {
-//            List<Contact> contacts = fragment.getSelectedContacts();
-//            Intent data = new Intent();
-//            data.putExtra(RESULT_CONTACT_DATA, (Serializable) contacts);
-//            setResult(Activity.RESULT_OK, data);
-//        }
-//        else {
-//            setResult(Activity.RESULT_CANCELED);
-//        }
+        List<Contact> contacts = new ArrayList<>();
+        if (mContacts != null) {
+            for (Contact contact : mContacts) {
+                if (contact.isChecked()) {
+                    contacts.add(contact);
+                }
+            }
+        }
 
+        Intent data = new Intent();
+        data.putExtra(RESULT_CONTACT_DATA, (Serializable) contacts);
+        setResult(Activity.RESULT_OK, data);
         finish();
     }
 
