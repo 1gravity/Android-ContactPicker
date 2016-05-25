@@ -23,8 +23,8 @@ import java.util.List;
 /**
  * All contacts have been loaded (including details).
  *
- * Publisher: ContactFragment
- * Subscriber: GroupFragment
+ * Publisher: ContactPickerActivity
+ * Subscriber: ContactFragment
  */
 public class ContactsLoaded {
 

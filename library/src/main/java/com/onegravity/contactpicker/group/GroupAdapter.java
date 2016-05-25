@@ -30,13 +30,13 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
     private LayoutInflater mInflater;
 
-    private List<GroupImpl> mGroups;
+    private List<? extends Group> mGroups;
 
     public GroupAdapter(List<GroupImpl> groups) {
         mGroups = groups;
     }
 
-    public void setData(List<GroupImpl> groups) {
+    public void setData(List<? extends Group> groups) {
         mGroups = groups;
         notifyDataSetChanged();
     }

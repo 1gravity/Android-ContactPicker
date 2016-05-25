@@ -31,9 +31,9 @@ import java.util.Set;
  * It can be instantiated and modified only within its own package to prevent modifications from
  * classes outside the package.
  */
-class ContactImpl extends ContactElementImpl implements Contact {
+public class ContactImpl extends ContactElementImpl implements Contact {
 
-	static ContactImpl fromCursor(Cursor cursor) {
+    public static ContactImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 		String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
 		String[] names = displayName != null ? displayName.split("\\s+") : new String[]{"---", "---"};
@@ -99,27 +99,27 @@ class ContactImpl extends ContactElementImpl implements Contact {
 		return mGroupIds;
 	}
 
-	void setFirstName(String value) {
+    public void setFirstName(String value) {
 		mFirstName = value;
 	}
 
-	void setLastName(String value) {
+    public void setLastName(String value) {
 		mLastName = value;
 	}
 
-	void setEmail(String value) {
+    public void setEmail(String value) {
 		mEmail = value;
 	}
 
-	void setPhone(String value) {
+    public void setPhone(String value) {
 		mPhone = value;
 	}
 
-	void setAddress(String value) {
+    public void setAddress(String value) {
 		mAddress = value;
 	}
 
-	void addGroupId(long value) {
+    public void addGroupId(long value) {
 		mGroupIds.add(value);
 	}
 

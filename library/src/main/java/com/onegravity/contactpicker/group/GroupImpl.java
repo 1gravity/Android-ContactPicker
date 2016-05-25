@@ -19,15 +19,11 @@ package com.onegravity.contactpicker.group;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 
-import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.ContactElementImpl;
-import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.contact.Contact;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,9 +31,9 @@ import java.util.Map;
  * It can be instantiated and modified only within its own package to prevent modifications from
  * classes outside the package.
  */
-class GroupImpl extends ContactElementImpl implements Group {
+public class GroupImpl extends ContactElementImpl implements Group {
 
-	static GroupImpl fromCursor(Cursor cursor) {
+	public static GroupImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Groups._ID));
 		String title = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.TITLE));
 		return new GroupImpl(id, title);
@@ -54,14 +50,14 @@ class GroupImpl extends ContactElementImpl implements Group {
 		return mContacts.values();
 	}
 
-    void addContact(Contact contact) {
+	public void addContact(Contact contact) {
         long contactId = contact.getId();
         if (! mContacts.keySet().contains(contactId)) {
             mContacts.put(contact.getId(), contact);
         }
     }
 
-    boolean hasContacts() {
+	public boolean hasContacts() {
         return mContacts.size() > 0;
     }
 

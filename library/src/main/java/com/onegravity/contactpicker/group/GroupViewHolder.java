@@ -44,7 +44,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         mDescription = (TextView) root.findViewById(R.id.description);
     }
 
-    void bind(final GroupImpl group) {
+    void bind(final Group group) {
         mRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

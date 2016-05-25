@@ -23,8 +23,8 @@ import java.util.List;
 /**
  * All groups have been loaded.
  *
- * Publisher: GroupFragment
- * Subscriber: ContactFragment
+ * Publisher: ContactPickerActivity
+ * Subscriber: GroupFragment
  */
 public class GroupsLoaded {
 
