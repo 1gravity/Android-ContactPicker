@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker;
+package com.onegravity.contactpicker.implementation;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -50,14 +50,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.onegravity.contactpicker.OnContactCheckedListener;
+import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactFragment;
-import com.onegravity.contactpicker.contact.ContactImpl;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
 import com.onegravity.contactpicker.group.Group;
 import com.onegravity.contactpicker.group.GroupFragment;
-import com.onegravity.contactpicker.group.GroupImpl;
 import com.onegravity.contactpicker.group.GroupsLoaded;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 

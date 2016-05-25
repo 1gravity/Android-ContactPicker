@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.contact;
+package com.onegravity.contactpicker.implementation;
 
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
-import com.onegravity.contactpicker.ContactElementImpl;
 import com.onegravity.contactpicker.Helper;
+import com.onegravity.contactpicker.contact.Contact;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,9 +31,9 @@ import java.util.Set;
  * It can be instantiated and modified only within its own package to prevent modifications from
  * classes outside the package.
  */
-public class ContactImpl extends ContactElementImpl implements Contact {
+class ContactImpl extends ContactElementImpl implements Contact {
 
-    public static ContactImpl fromCursor(Cursor cursor) {
+    static ContactImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 		String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
 		String[] names = displayName != null ? displayName.split("\\s+") : new String[]{"---", "---"};
@@ -99,27 +99,27 @@ public class ContactImpl extends ContactElementImpl implements Contact {
 		return mGroupIds;
 	}
 
-    public void setFirstName(String value) {
+    void setFirstName(String value) {
 		mFirstName = value;
 	}
 
-    public void setLastName(String value) {
+    void setLastName(String value) {
 		mLastName = value;
 	}
 
-    public void setEmail(String value) {
+    void setEmail(String value) {
 		mEmail = value;
 	}
 
-    public void setPhone(String value) {
+    void setPhone(String value) {
 		mPhone = value;
 	}
 
-    public void setAddress(String value) {
+    void setAddress(String value) {
 		mAddress = value;
 	}
 
-    public void addGroupId(long value) {
+    void addGroupId(long value) {
 		mGroupIds.add(value);
 	}
 

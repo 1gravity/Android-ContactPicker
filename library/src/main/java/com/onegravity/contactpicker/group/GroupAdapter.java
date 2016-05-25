@@ -32,7 +32,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
     private List<? extends Group> mGroups;
 
-    public GroupAdapter(List<GroupImpl> groups) {
+    public GroupAdapter(List<? extends Group> groups) {
         mGroups = groups;
     }
 

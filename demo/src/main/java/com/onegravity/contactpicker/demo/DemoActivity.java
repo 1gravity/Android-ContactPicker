@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.ContactPickerActivity;
+import com.onegravity.contactpicker.implementation.ContactPickerActivity;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.picture.ContactPictureType;

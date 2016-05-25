@@ -46,7 +46,7 @@ import android.view.View.OnClickListener;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.onegravity.contactpicker.ContactPickerActivity;
+import com.onegravity.contactpicker.implementation.ContactPickerActivity;
 import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.R;
 

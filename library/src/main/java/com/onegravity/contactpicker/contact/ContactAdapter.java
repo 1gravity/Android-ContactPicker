@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.ContactFilter;
-import com.onegravity.contactpicker.ContactPickerActivity;
+import com.onegravity.contactpicker.implementation.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
 import com.onegravity.contactpicker.picture.ContactPictureType;

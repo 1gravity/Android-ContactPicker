@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.group;
+package com.onegravity.contactpicker.implementation;
 
 import android.database.Cursor;
 import android.provider.ContactsContract;
 
-import com.onegravity.contactpicker.ContactElementImpl;
 import com.onegravity.contactpicker.contact.Contact;
+import com.onegravity.contactpicker.group.Group;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,9 +31,9 @@ import java.util.Map;
  * It can be instantiated and modified only within its own package to prevent modifications from
  * classes outside the package.
  */
-public class GroupImpl extends ContactElementImpl implements Group {
+class GroupImpl extends ContactElementImpl implements Group {
 
-	public static GroupImpl fromCursor(Cursor cursor) {
+	static GroupImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Groups._ID));
 		String title = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.TITLE));
 		return new GroupImpl(id, title);
@@ -50,14 +50,14 @@ public class GroupImpl extends ContactElementImpl implements Group {
 		return mContacts.values();
 	}
 
-	public void addContact(Contact contact) {
+	void addContact(Contact contact) {
         long contactId = contact.getId();
         if (! mContacts.keySet().contains(contactId)) {
             mContacts.put(contact.getId(), contact);
         }
     }
 
-	public boolean hasContacts() {
+	boolean hasContacts() {
         return mContacts.size() > 0;
     }
 

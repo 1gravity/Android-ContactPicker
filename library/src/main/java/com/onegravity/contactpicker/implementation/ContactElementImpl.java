@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker;
+package com.onegravity.contactpicker.implementation;
+
+import com.onegravity.contactpicker.ContactElement;
+import com.onegravity.contactpicker.Helper;
+import com.onegravity.contactpicker.OnContactCheckedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +26,7 @@ import java.util.List;
 /**
  * The concrete but abstract implementation of ContactElement.
  */
-public abstract class ContactElementImpl implements ContactElement {
+abstract class ContactElementImpl implements ContactElement {
 
 	final private long mId;
 	final private String mDisplayName;
@@ -30,7 +34,7 @@ public abstract class ContactElementImpl implements ContactElement {
 	transient private List<OnContactCheckedListener> mListeners = new ArrayList<>();
 	transient private boolean mChecked = false;
 
-	public ContactElementImpl(long id, String displayName) {
+	ContactElementImpl(long id, String displayName) {
 		mId = id;
 		mDisplayName = Helper.isNullOrEmpty(displayName) ? "---" : displayName;
 	}

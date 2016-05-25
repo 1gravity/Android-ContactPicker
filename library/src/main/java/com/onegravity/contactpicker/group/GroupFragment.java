@@ -37,7 +37,7 @@ import java.util.List;
 public class GroupFragment extends Fragment {
 
     // the complete list of groups
-    private List<GroupImpl> mGroups = new ArrayList<>();
+    private List<? extends Group> mGroups = new ArrayList<>();
 
     private GroupAdapter mAdapter;
 
