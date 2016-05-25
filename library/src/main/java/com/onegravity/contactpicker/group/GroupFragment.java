@@ -36,7 +36,7 @@ import java.util.List;
 
 public class GroupFragment extends Fragment {
 
-    // the complete list of groups
+    // the list of all visible groups
     private List<? extends Group> mGroups = new ArrayList<>();
 
     private GroupAdapter mAdapter;
@@ -96,7 +96,8 @@ public class GroupFragment extends Fragment {
     public void onEventMainThread(GroupsLoaded event) {
         EventBus.getDefault().removeStickyEvent(event);
 
-        mAdapter.setData(event.getGroups());
+        mGroups = event.getGroups();
+        mAdapter.setData(mGroups);
     }
 
     // ****************************************** Option Menu *******************************************

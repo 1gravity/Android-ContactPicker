@@ -26,12 +26,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.implementation.ContactSelectionChanged;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ContactFragment extends Fragment {
+
+    // the list of all contacts
+    private List<? extends Contact> mContacts = new ArrayList<>();
 
     private ContactAdapter mAdapter;
 
@@ -93,7 +100,9 @@ public class ContactFragment extends Fragment {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactsLoaded event) {
         EventBus.getDefault().removeStickyEvent(event);
-        mAdapter.setData(event.getContacts());
+
+        mContacts = event.getContacts();
+        mAdapter.setData(mContacts);
     }
 
     // ****************************************** Option Menu *******************************************
@@ -110,16 +119,25 @@ public class ContactFragment extends Fragment {
     }
 
     private void checkAll() {
+        // determine if all contacts are checked
+        boolean allChecked = true;
+        for (Contact contact : mContacts) {
+            if (! contact.isChecked()) {
+                allChecked = false;
+                break;
+            }
+        }
+
         // if all are checked then un-check the contacts, otherwise check them all
-//        boolean isChecked = mSelectedContacts < mContacts.size();
-//        for (Contact contact : mContacts) {
-//            if (contact.isChecked() != isChecked) {
-//                contact.setChecked(isChecked, true);
-//            }
-//        }
-//
-//        mAdapter.notifyDataSetChanged();
-//        SelectionChanged.post();
+        boolean isChecked = ! allChecked;
+        for (Contact contact : mContacts) {
+            if (contact.isChecked() != isChecked) {
+                contact.setChecked(isChecked, true);
+            }
+        }
+
+        ContactSelectionChanged.post();
+        mAdapter.notifyDataSetChanged();
     }
 
 }

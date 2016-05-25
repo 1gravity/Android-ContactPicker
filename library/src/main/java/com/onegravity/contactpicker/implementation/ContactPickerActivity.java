@@ -61,6 +61,10 @@ import com.onegravity.contactpicker.group.GroupFragment;
 import com.onegravity.contactpicker.group.GroupsLoaded;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -260,8 +264,17 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
     protected void onResume() {
         super.onResume();
 
+        EventBus.getDefault().register(this);
+
         getSupportLoaderManager().initLoader(CONTACTS_LOADER_ID, null, this);
         getSupportLoaderManager().initLoader(GROUPS_LOADER_ID, null, this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -711,46 +724,84 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            // Contacts
             if (wasChecked != isChecked) {
                 mNrOfSelectedContacts += isChecked ? 1 : -1;
                 mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
                 updateTitle();
-            }
 
-            // Groups
-            processGroupSelection();
+                if (! isChecked) {
+                    processGroupSelection();
+                }
+            }
         }
     };
 
     /**
-     * Check/un-check a group's contacts if the user checks/un-checks a group
+     * Check/un-check a group's contacts if the user checks/un-checks a group.
      */
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            // Contacts
-            for (Contact contact : group.getContacts()) {
-                if (contact.isChecked() != isChecked) {
-                    contact.setChecked(isChecked, true);
-                }
-            }
+            // check/un-check the group's contacts
+            processContactSelection(group, isChecked);
 
-            mNrOfSelectedContacts = 0;
-            for (Contact contact : mContacts) {
-                if (contact.isChecked()) {
-                    mNrOfSelectedContacts++;
-                }
-            }
-
-            ContactsLoaded.post(mContacts);
-            updateTitle();
-
-            // Groups
+            // check if we need to deselect some groups
             processGroupSelection();
         }
     };
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ContactSelectionChanged event) {
+        // all has changed -> calculate the number of selected contacts and update the title
+        calcNrOfSelectedContacts();
+
+        // check if we need to deselect some groups
+        processGroupSelection();
+    }
+
+    /**
+     * Check/un-check contacts for a group that has been selected/deselected.
+     * Call this when a group has been selected/deselected or after a ContactSelectionChanged event.
+     */
+    private void processContactSelection(Group group, boolean isChecked) {
+        if (group == null || mContacts == null) return;
+
+        // check/un-check contacts
+        boolean hasChanged = false;
+        for (Contact contact : group.getContacts()) {
+            if (contact.isChecked() != isChecked) {
+                contact.setChecked(isChecked, true);
+                hasChanged = true;
+            }
+        }
+
+        if (hasChanged) {
+            ContactsLoaded.post(mContacts);
+            calcNrOfSelectedContacts();
+        }
+    }
+
+    /**
+     * Calculate the number or selected contacts.
+     * Call this when a group has been selected/deselected or after a ContactSelectionChanged event.
+     */
+    private void calcNrOfSelectedContacts() {
+        if (mContacts == null) return;
+
+        mNrOfSelectedContacts = 0;
+        for (Contact contact : mContacts) {
+            if (contact.isChecked()) {
+                mNrOfSelectedContacts++;
+            }
+        }
+
+        updateTitle();
+    }
+
+    /**
+     * Check if a group needs to be deselected because none of its contacts is selected.
+     * Call this when a contact or group has been deselected or after a ContactSelectionChanged event.
+     */
     private void processGroupSelection() {
         if (mGroups == null) return;
 
