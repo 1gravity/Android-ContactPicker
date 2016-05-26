@@ -39,7 +39,7 @@ class ContactImpl extends ContactElementImpl implements Contact {
 		String[] names = displayName != null ? displayName.split("\\s+") : new String[]{"---", "---"};
 		String firstName = names.length >= 1 ? names[0] : displayName;
 		String lastName = names.length >= 2 ? names[1] : "";
-		String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI));
+		String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
 		Uri uri = photoUri != null ? Uri.parse(photoUri) : null;
 		return new ContactImpl(id, displayName, firstName, lastName, uri);
 	}

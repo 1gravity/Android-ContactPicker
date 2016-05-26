@@ -346,7 +346,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             ContactsContract.Contacts._ID,
             ContactsContract.Contacts.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Contacts.PHOTO_URI};
+            ContactsContract.Contacts.PHOTO_THUMBNAIL_URI};
     private static final String CONTACTS_SORT = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC";
 
     /*
