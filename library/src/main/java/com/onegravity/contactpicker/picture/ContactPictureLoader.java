@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
+import static android.graphics.Bitmap.createBitmap;
+
 /**
  * Runnable to load a contact picture for a specific ContactBadge.
  */
@@ -75,6 +77,18 @@ public class ContactPictureLoader implements Runnable {
         try {
             stream = context.getContentResolver().openInputStream(photoUri);
             bitmap = BitmapFactory.decodeStream(stream);
+
+            // some contact pictures aren't square...
+            if (bitmap.getWidth() != bitmap.getHeight()) {
+                int w = bitmap.getWidth();
+                int h = bitmap.getHeight();
+                int indent = Math.abs(w - h) / 2;
+                int x = w > h ? indent : 0;
+                int y = w < h ? indent : 0;
+                int size = Math.min(w, h);
+                bitmap = createBitmap(bitmap, x, y, size, size);
+            }
+
             if (mRoundContactPictures) {
                 bitmap = getRoundedBitmap(bitmap);
             }
@@ -96,7 +110,7 @@ public class ContactPictureLoader implements Runnable {
      * See http://www.curious-creature.com/2012/12/11/android-recipe-1-image-with-rounded-corners/
      */
     private Bitmap getRoundedBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap output = createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
         BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         Paint paint = new Paint();
