@@ -1,4 +1,3 @@
 - remove all log statements
 - use email/phone type and make it available through the public API
 - Contact headers a-z
-- add parameter for sorting (first name, last name etc.)

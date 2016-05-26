@@ -44,6 +44,7 @@ import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactFragment;
 import com.onegravity.contactpicker.contact.ContactSelectionChanged;
+import com.onegravity.contactpicker.contact.ContactSortOrder;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
 import com.onegravity.contactpicker.group.Group;
 import com.onegravity.contactpicker.group.GroupFragment;
@@ -68,18 +69,25 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
     /**
      * Use this parameter to determine whether the contact picture shows a contact badge and if yes
-     * what type (round, square)
+     * what type (round, square).
      *
      * {@link com.onegravity.contactpicker.picture.ContactPictureType}
      */
     public static final String EXTRA_CONTACT_BADGE_TYPE = "EXTRA_CONTACT_BADGE_TYPE";
 
     /**
-     * Use this to define what contact information is used for the description field (second line)
+     * Use this to define what contact information is used for the description field (second line).
      *
      * {@link com.onegravity.contactpicker.contact.ContactDescription}
      */
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
+
+    /**
+     * Use this to define the sorting order for contacts
+     *
+     * {@link com.onegravity.contactpicker.contact.ContactSortOrder}
+     */
+    public static final String EXTRA_CONTACT_SORT_ORDER = "EXTRA_CONTACT_SORT_ORDER";
 
     /**
      * We put the resulting contact list into the Intent as extra data with this key.
@@ -95,6 +103,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static ContactDescription getContactDescription() {
         return sDescription;
     }
+
+    private ContactSortOrder mSortOrder = ContactSortOrder.AUTOMATIC;
 
     private PagerAdapter mAdapter;
 
@@ -119,7 +129,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // check if we have the READ_CONTACTS permission, if not --> terminate
+        /*
+         * Check if we have the READ_CONTACTS permission, if not --> terminate.
+         */
         try {
             int pid = android.os.Process.myPid();
             PackageManager pckMgr = getPackageManager();
@@ -132,7 +144,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
             return;
         }
 
-        // retrieve default title which is used if no contacts are selected
+        /*
+         * Retrieve default title used if no contacts are selected.
+         */
         if (savedInstanceState == null) {
             try {
                 PackageManager pkMgr = getPackageManager();
@@ -146,18 +160,17 @@ public class ContactPickerActivity extends AppCompatActivity implements
         else {
             mDefaultTitle = savedInstanceState.getString("mDefaultTitle");
 
+            // Retrieve selected contact and group ids.
             try {
                 mSelectedContactIds = (HashSet<Long>) savedInstanceState.getSerializable(CONTACT_IDS);
-            }
-            catch (ClassCastException ignore) {}
-
-            try {
                 mSelectedGroupIds = (HashSet<Long>) savedInstanceState.getSerializable(GROUP_IDS);
             }
             catch (ClassCastException ignore) {}
         }
 
-        // read Activity parameter ContactPictureType
+        /*
+         * Retrieve ContactPictureType.
+         */
         sBadgeType = ContactPictureType.ROUND;
         Intent intent = getIntent();
         String tmp = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
@@ -170,7 +183,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
         }
 
-        // read Activity parameter ContactDescription
+        /*
+         * Retrieve ContactDescription.
+         */
         sDescription = ContactDescription.EMAIL;
         tmp = intent.getStringExtra(EXTRA_CONTACT_DESCRIPTION);
         if (tmp != null) {
@@ -179,6 +194,20 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
             catch (IllegalArgumentException e) {
                 Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_DESCRIPTION value, defaulting to EMAIL");
+            }
+        }
+
+        /*
+         * Retrieve ContactSortOrder.
+         */
+        mSortOrder = ContactSortOrder.AUTOMATIC;
+        tmp = intent.getStringExtra(EXTRA_CONTACT_SORT_ORDER);
+        if (tmp != null) {
+            try {
+                mSortOrder = ContactSortOrder.valueOf(tmp);
+            }
+            catch (IllegalArgumentException e) {
+                Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_SORT_ORDER value, defaulting to AUTOMATIC");
             }
         }
 
@@ -446,6 +475,17 @@ public class ContactPickerActivity extends AppCompatActivity implements
      */
     private int mNrOfSelectedContacts = 0;
 
+    private Comparator<ContactImpl> mContactComparator = new Comparator<ContactImpl>() {
+        @Override
+        public int compare(ContactImpl lhs, ContactImpl rhs) {
+            switch(mSortOrder) {
+                case FIRST_NAME: return lhs.getFirstName().compareTo(rhs.getFirstName());
+                case LAST_NAME: return lhs.getLastName().compareTo(rhs.getLastName());
+                default: return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+            }
+        }
+    };
+
     private void readContacts(Cursor cursor) {
         Log.e("1gravity", "***************************************************************");
         Log.e("1gravity", "* CONTACTS                                                    *");
@@ -455,9 +495,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mContactsByLookupKey.clear();
         mNrOfSelectedContacts = 0;
 
+        int count = 0;
         if (cursor.moveToFirst()) {
             cursor.moveToPrevious();
-            int count = 0;
             while (cursor.moveToNext()) {
                 ContactImpl contact = ContactImpl.fromCursor(cursor);
                 mContacts.add(contact);
@@ -481,14 +521,29 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
                 // update the ui once some contacts have loaded
                 if (++count >= BATCH_SIZE) {
-                    ContactsLoaded.post(mContacts);
+                    sortAndPostCopy(mContacts);
                     count = 0;
                 }
             }
         }
 
+        if (count > 0) {
+            sortAndPostCopy(mContacts);
+        }
+
         updateTitle();
-        ContactsLoaded.post(mContacts);
+    }
+
+    /**
+     * For concurrency reasons we create a copy of the contacts list before it's sorted and sent to
+     * the ContactFragment. Note: this affects only the list itself, individual contacts are still
+     * shared between the Activity and the Fragment (and its adapter).
+     */
+    private void sortAndPostCopy(List<ContactImpl> contacts) {
+        List<ContactImpl> copy = new ArrayList<>();
+        copy.addAll(contacts);
+        Collections.sort(copy, mContactComparator);
+        ContactsLoaded.post(copy);
     }
 
     private void readContactDetails(Cursor cursor) {
@@ -508,7 +563,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
         }
 
-        ContactsLoaded.post(mContacts);
+        sortAndPostCopy(mContacts);
         joinContactsAndGroups(mContacts);
     }
 
