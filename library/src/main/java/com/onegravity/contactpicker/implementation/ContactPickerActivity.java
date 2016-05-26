@@ -55,6 +55,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -383,7 +385,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
             ContactsContract.Groups.SOURCE_ID,
             ContactsContract.Groups.TITLE};
     private static final String GROUPS_SELECTION = ContactsContract.Groups.DELETED + " = 0";
-
     private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
 
     @Override
@@ -633,6 +634,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 }
             }
         }
+
+        Collections.sort(mVisibleGroups, new Comparator<GroupImpl>() {
+            @Override
+            public int compare(GroupImpl lhs, GroupImpl rhs) {
+                return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+            }
+        });
 
         GroupsLoaded.post(mVisibleGroups);
     }
