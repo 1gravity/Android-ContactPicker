@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.BaseFragment;
 import com.onegravity.contactpicker.R;
-import com.onegravity.contactpicker.implementation.ContactSelectionChanged;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

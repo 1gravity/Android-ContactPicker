@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.implementation;
+package com.onegravity.contactpicker.contact;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -36,7 +36,8 @@ import org.greenrobot.eventbus.EventBus;
 public class ContactSelectionChanged {
 
     private static final ContactSelectionChanged sEvent = new ContactSelectionChanged();
-    public static void post() {
+
+    static void post() {
         EventBus.getDefault().post( sEvent );
     }
 

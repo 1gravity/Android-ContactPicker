@@ -22,7 +22,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.implementation.ContactPickerActivity;
+import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactBadge;
 import com.onegravity.contactpicker.picture.ContactPictureManager;

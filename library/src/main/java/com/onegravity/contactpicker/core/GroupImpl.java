@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.implementation;
+package com.onegravity.contactpicker.core;
 
 import android.database.Cursor;
 import android.provider.ContactsContract;

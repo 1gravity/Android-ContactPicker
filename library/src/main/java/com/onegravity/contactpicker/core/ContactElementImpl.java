@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.implementation;
+package com.onegravity.contactpicker.core;
 
 import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.Helper;
