@@ -18,9 +18,13 @@ package com.onegravity.contactpicker.contact;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +38,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class ContactFragment extends Fragment {
+public class ContactFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     // the list of all contacts
     private List<? extends Contact> mContacts = new ArrayList<>();
@@ -108,9 +113,18 @@ public class ContactFragment extends Fragment {
     // ****************************************** Option Menu *******************************************
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if( id == R.id.menu_check_all) {
+        if( id == R.id.action_check_all) {
             checkAll();
             return true;
         }
@@ -138,6 +152,32 @@ public class ContactFragment extends Fragment {
 
         ContactSelectionChanged.post();
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        final String queryString = newText.toString().toLowerCase( Locale.getDefault() );
+        final String[] queryStrings = queryString.split(" ");
+
+        final List<Contact> filteredElements = filter(mContacts, queryStrings);
+        mAdapter.setData(filteredElements);
+
+        return true;
+    }
+
+    private List<Contact> filter(List<? extends Contact> contacts, String[] queryStrings) {
+        List<Contact> filteredElements = new ArrayList<>();
+        for (Contact contact : contacts) {
+            if (contact.matchesQuery(queryStrings)) {
+                filteredElements.add(contact);
+            }
+        }
+        return filteredElements;
     }
 
 }

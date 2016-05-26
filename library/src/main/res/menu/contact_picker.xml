@@ -17,25 +17,24 @@
 
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:k10="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_search"
-        k10:showAsAction="ifRoom|withText|collapseActionView"
-        android:actionLayout="@layout/contact_search_widget"
-        k10:actionLayout="@layout/contact_search_widget"
+        android:id="@+id/action_search"
+        app:showAsAction="ifRoom|withText|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="?attr/contactBadge_icMenuSearch"
         android:title="@string/action_search"/>
 
     <item
-        android:id="@+id/menu_check_all"
-        k10:showAsAction="ifRoom|withText"
+        android:id="@+id/action_check_all"
+        app:showAsAction="ifRoom|withText"
         android:icon="?attr/contactBadge_icMenuCheckAll"
         android:title="@string/action_select_all"/>
 
     <item
-        android:id="@+id/menu_done"
-        k10:showAsAction="ifRoom|withText"
+        android:id="@+id/action_done"
+        app:showAsAction="ifRoom|withText"
         android:icon="?attr/contactBadge_icMenuOK"
         android:title="@android:string/ok"/>
 

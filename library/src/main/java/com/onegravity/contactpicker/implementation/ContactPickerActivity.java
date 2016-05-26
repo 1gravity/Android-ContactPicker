@@ -17,9 +17,7 @@
 package com.onegravity.contactpicker.implementation;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -34,21 +32,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
@@ -72,7 +60,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class ContactPickerActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ContactPickerActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Use this parameter to determine whether the contact picture shows a contact badge and if yes
@@ -319,12 +308,8 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
             finish();
             return true;
         }
-        else if( id == R.id.menu_done) {
+        else if( id == R.id.action_done) {
             onDone();
-            return true;
-        }
-        else if( id == R.id.menu_search) {
-            onSearch(item);
             return true;
         }
 
@@ -346,64 +331,6 @@ public class ContactPickerActivity extends AppCompatActivity implements LoaderMa
         data.putExtra(RESULT_CONTACT_DATA, (Serializable) contacts);
         setResult(Activity.RESULT_OK, data);
         finish();
-    }
-
-    @SuppressLint("InlinedApi")
-    private void onSearch(final MenuItem item) {
-        ViewGroup searchWidget = (ViewGroup)item.getActionView();
-        final InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        final EditText input = (EditText) searchWidget.findViewById(R.id.search_text);
-
-        input.setImeOptions(EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_FULLSCREEN);
-
-        // TextWatcher
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //mAdapter.getFilter().filter(s);
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        // OnEditorActionListener (return/enter key)
-        input.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH || (event!=null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                    item.collapseActionView();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        // OnClickListener (close button)
-        searchWidget.findViewById(R.id.search_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                item.collapseActionView();
-                //mAdapter.getFilter().filter("");
-            }
-        });
-
-        // OnActionExpandListener
-        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                input.requestFocus();
-                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-                return true;
-            }
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                input.clearFocus();
-                imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
-                return true;
-            }
-        });
     }
 
     // ****************************************** Loader Methods *******************************************

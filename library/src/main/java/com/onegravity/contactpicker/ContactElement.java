@@ -34,4 +34,6 @@ public interface ContactElement extends Serializable {
 
     void addOnContactCheckedListener(OnContactCheckedListener listener);
 
+	boolean matchesQuery(String[] queryStrings);
+
 }

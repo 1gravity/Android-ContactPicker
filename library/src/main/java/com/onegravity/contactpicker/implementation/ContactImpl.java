@@ -123,7 +123,7 @@ class ContactImpl extends ContactElementImpl implements Contact {
 		mGroupIds.add(value);
 	}
 
-	@Override
+    @Override
 	public String toString() {
 		return super.toString() + ", " + mFirstName + " " + mLastName + ", " + mEmail;
 	}

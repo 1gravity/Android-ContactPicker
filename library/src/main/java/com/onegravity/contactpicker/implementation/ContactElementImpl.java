@@ -22,6 +22,7 @@ import com.onegravity.contactpicker.OnContactCheckedListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The concrete but abstract implementation of ContactElement.
@@ -70,7 +71,22 @@ abstract class ContactElementImpl implements ContactElement {
         mListeners.add(listener);
     }
 
-	@Override
+    @Override
+    public boolean matchesQuery(String[] queryStrings) {
+        String dispName = getDisplayName();
+        if (Helper.isNullOrEmpty(dispName)) return false;
+
+        dispName = dispName.toLowerCase(Locale.getDefault());
+        for (String queryString : queryStrings) {
+            if (! dispName.contains(queryString)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
 	public String toString() {
 		return mId + ": " + mDisplayName;
 	}

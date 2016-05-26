@@ -18,9 +18,13 @@ package com.onegravity.contactpicker.group;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +37,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class GroupFragment extends Fragment {
+public class GroupFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     // the list of all visible groups
     private List<? extends Group> mGroups = new ArrayList<>();
@@ -103,9 +108,18 @@ public class GroupFragment extends Fragment {
     // ****************************************** Option Menu *******************************************
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if( id == R.id.menu_check_all) {
+        if( id == R.id.action_check_all) {
             checkAll();
             return true;
         }
@@ -132,6 +146,32 @@ public class GroupFragment extends Fragment {
         }
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        final String queryString = newText.toString().toLowerCase( Locale.getDefault() );
+        final String[] queryStrings = queryString.split(" ");
+
+        final List<Group> filteredElements = filter(mGroups, queryStrings);
+        mAdapter.setData(filteredElements);
+
+        return true;
+    }
+
+    private List<Group> filter(List<? extends Group> groups, String[] queryStrings) {
+        List<Group> filteredElements = new ArrayList<>();
+        for (Group group : groups) {
+            if (group.matchesQuery(queryStrings)) {
+                filteredElements.add(group);
+            }
+        }
+        return filteredElements;
     }
 
 }

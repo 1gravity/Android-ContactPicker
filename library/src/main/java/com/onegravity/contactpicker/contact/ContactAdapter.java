@@ -22,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.onegravity.contactpicker.ContactFilter;
 import com.onegravity.contactpicker.implementation.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
@@ -41,12 +40,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     private LayoutInflater mInflater;
 
-    private ContactFilter mFilter;
-
     // position --> label
     private LinkedHashMap<Integer, String> mSectionLabels;
-
-    private boolean mNotifyOnChange = true;
 
     public ContactAdapter(Context context, List<Contact> contacts) {
         mContacts = contacts;
@@ -90,14 +85,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
     @Override
     public long getItemId(int position) {
         return mContacts == null ? super.getItemId(position) : mContacts.get(position).getId();
-    }
-
-    /*ContactFilter getFilter() {
-        return mFilter;
-    }*/
-
-    public void setNotifyOnChange(boolean notifyOnChange) {
-        mNotifyOnChange = notifyOnChange;
     }
 
 }
