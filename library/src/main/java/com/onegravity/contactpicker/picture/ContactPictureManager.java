@@ -20,9 +20,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
+import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.picture.cache.ContactPictureCache;
 import com.onegravity.contactpicker.picture.cache.ContactUriCache;
-import com.onegravity.contactpicker.contact.Contact;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -86,8 +86,7 @@ public class ContactPictureManager {
         else if (photoUri == Uri.EMPTY || bitmap == sDummyBitmap) {
             // 2) we already tried to retrieve the contact picture before (unsuccessfully)
             // --> "letter" contact image
-            LetterContact uc = new LetterContact(contact);
-            badge.setCharacter(uc.getContactLetter(), uc.getContactColor());
+            badge.setCharacter(contact.getContactLetter(), contact.getContactColor());
         }
 
         else {
@@ -96,8 +95,7 @@ public class ContactPictureManager {
 
                 if (! hasLoaderAssociated) {
                     // 3a) temporary "letter" contact image till the contact picture is loaded (if there's any)
-                    LetterContact uc = new LetterContact(contact);
-                    badge.setCharacter(uc.getContactLetter(), uc.getContactColor());
+                    badge.setCharacter(contact.getContactLetter(), contact.getContactColor());
 
                     // 3b) load the contact picture
                     ContactPictureLoader loader = new ContactPictureLoader(key, badge, contact.getPhotoUri(), mRoundContactPictures);

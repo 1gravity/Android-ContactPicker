@@ -140,7 +140,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private String mDefaultTitle;
 
     // update the adapter after a certain amount of contacts has loaded
-    private static final int BATCH_SIZE = 25;
+    private static final int BATCH_SIZE = 50;
 
     /*
      * The selected ids are saved in onSaveInstanceState, restored in onCreate and then applied to
@@ -235,7 +235,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
         mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
-                                    mBadgeType, mDescription, mDescriptionType);
+                                    mSortOrder, mBadgeType, mDescription, mDescriptionType);
         viewPager.setAdapter(mAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
@@ -449,9 +449,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
         @Override
         public int compare(ContactImpl lhs, ContactImpl rhs) {
             switch(mSortOrder) {
-                case FIRST_NAME: return lhs.getFirstName().compareTo(rhs.getFirstName());
-                case LAST_NAME: return lhs.getLastName().compareTo(rhs.getLastName());
-                default: return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+                case FIRST_NAME: return lhs.getFirstName().compareToIgnoreCase(rhs.getFirstName());
+                case LAST_NAME: return lhs.getLastName().compareToIgnoreCase(rhs.getLastName());
+                default: return lhs.getDisplayName().compareToIgnoreCase(rhs.getDisplayName());
             }
         }
     };

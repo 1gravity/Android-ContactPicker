@@ -1,1 +1,1 @@
-- Contact headers a-z
+- theme doesn't transfer to the ContactPickerActivity

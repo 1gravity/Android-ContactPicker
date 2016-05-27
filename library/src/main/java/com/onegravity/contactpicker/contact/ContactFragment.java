@@ -33,26 +33,30 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import xyz.danoz.recyclerviewfastscroller.sectionindicator.title.SectionTitleIndicator;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 public class ContactFragment extends BaseFragment {
 
-    private ContactPictureType mContactPictureType;
-    private ContactDescription mContactDescription;
-    private int mContactDescriptionType;
+    private ContactSortOrder mSortOrder;
+    private ContactPictureType mPictureType;
+    private ContactDescription mDescription;
+    private int mDescriptionType;
 
     // the list of all contacts
     private List<? extends Contact> mContacts = new ArrayList<>();
 
     private ContactAdapter mAdapter;
 
-    public static ContactFragment newInstance(ContactPictureType contactPictureType,
+    public static ContactFragment newInstance(ContactSortOrder sortOrder,
+                                              ContactPictureType pictureType,
                                               ContactDescription contactDescription,
-                                              int contactDescriptionType) {
+                                              int descriptionType) {
         Bundle args = new Bundle();
-        args.putString("contactPictureType", contactPictureType.name());
+        args.putString("sortOrder", sortOrder.name());
+        args.putString("pictureType", pictureType.name());
         args.putString("contactDescription", contactDescription.name());
-        args.putInt("contactDescriptionType", contactDescriptionType);
+        args.putInt("descriptionType", descriptionType);
         ContactFragment fragment = new ContactFragment();
         fragment.setArguments(args);
         return fragment;
@@ -65,15 +69,15 @@ public class ContactFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mContactPictureType = ContactPictureType.lookup( args.getString("contactPictureType") );
-        mContactDescription = ContactDescription.lookup( args.getString("contactDescription") );
-        mContactDescriptionType = args.getInt("contactDescriptionType");
+        mSortOrder = ContactSortOrder.lookup( args.getString("sortOrder") );
+        mPictureType = ContactPictureType.lookup( args.getString("pictureType") );
+        mDescription = ContactDescription.lookup( args.getString("contactDescription") );
+        mDescriptionType = args.getInt("descriptionType");
     }
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mAdapter = new ContactAdapter(getContext(), null, mContactPictureType,
-                                      mContactDescription, mContactDescriptionType);
+        mAdapter = new ContactAdapter(getContext(), null, mSortOrder, mPictureType, mDescription, mDescriptionType);
 
         View rootLayout = super.createView(inflater, R.layout.contact_list, mAdapter, mContacts);
 
@@ -82,6 +86,10 @@ public class ContactFragment extends BaseFragment {
         VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootLayout.findViewById(R.id.fast_scroller);
         fastScroller.setRecyclerView(recyclerView);
         recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
+
+        // configure section indexer
+        SectionTitleIndicator sectionTitleIndicator = (SectionTitleIndicator ) rootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
+        fastScroller.setSectionIndicator(sectionTitleIndicator);
 
         return rootLayout;
     }

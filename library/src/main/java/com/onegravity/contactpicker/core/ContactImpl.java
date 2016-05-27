@@ -22,11 +22,15 @@ import android.provider.ContactsContract;
 
 import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.contact.Contact;
+import com.onegravity.contactpicker.contact.ContactSortOrder;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * ContactImpl is the concrete Contact implementation.
@@ -34,6 +38,32 @@ import java.util.Set;
  * classes outside the package.
  */
 class ContactImpl extends ContactElementImpl implements Contact {
+
+	private static final Pattern CONTACT_LETTER = Pattern.compile("[^a-zA-Z]*([a-zA-Z]).*");
+
+	/**
+	 * @see <a href="http://www.google.com/design/spec/style/color.html#color-color-palette">Color palette used</a>
+	 */
+	private final static int CONTACT_COLORS_MATERIAL[] = {
+			0xffF44336,
+			0xffE91E63,
+			0xff9C27B0,
+			0xff673AB7,
+			0xff3F51B5,
+			0xff2196F3,
+			0xff03A9F4,
+			0xff00BCD4,
+			0xff009688,
+			0xff4CAF50,
+			0xff8BC34A,
+			0xffCDDC39,
+			0xffFFC107,
+			0xffFF9800,
+			0xffFF5722,
+			0xff795548,
+			0xff9E9E9E,
+			0xff607D8B
+	};
 
     static ContactImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -55,6 +85,10 @@ class ContactImpl extends ContactElementImpl implements Contact {
     private Map<Integer, String> mAddress = new HashMap<>();
 	transient private Uri mPhotoUri;
 	private Set<Long> mGroupIds = new HashSet<>();
+
+	private char mContactLetterBadge;
+	private char mContactLetterScroll;
+	private Integer mContactColor;
 
 	private ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
 		super(id, displayName);
@@ -101,6 +135,43 @@ class ContactImpl extends ContactElementImpl implements Contact {
         }
         return  address;
     }
+
+	@Override
+	public char getContactLetter() {
+		if (mContactLetterBadge == 0) {
+			Matcher m = CONTACT_LETTER.matcher( getDisplayName() );
+			String letter = m.matches() ? m.group(1).toUpperCase(Locale.US) : "?";
+			mContactLetterBadge = Helper.isNullOrEmpty(letter) ? '?' : letter.charAt(0);
+		}
+
+		return mContactLetterBadge;
+	}
+
+	@Override
+	public char getContactLetter(ContactSortOrder sortOrder) {
+		if (mContactLetterScroll == 0) {
+			String name;
+			switch(sortOrder) {
+				case FIRST_NAME: name = getFirstName(); break;
+				case LAST_NAME: name = getLastName(); break;
+				default: name = getDisplayName(); break;
+			}
+			mContactLetterScroll = Helper.isNullOrEmpty(name) ? '?' :
+								   name.toUpperCase(Locale.getDefault()).charAt(0);
+		}
+
+		return mContactLetterScroll;
+	}
+
+	@Override
+	public int getContactColor() {
+		if (mContactColor == null) {
+			String key = getDisplayName();
+			int value = Helper.isNullOrEmpty(key) ? hashCode() : key.hashCode();
+			mContactColor = CONTACT_COLORS_MATERIAL[Math.abs(value) % CONTACT_COLORS_MATERIAL.length];
+		}
+		return mContactColor;
+	}
 
 	/**
 	 * Matches:

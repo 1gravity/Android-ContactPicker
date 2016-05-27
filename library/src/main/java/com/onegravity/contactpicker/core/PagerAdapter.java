@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactFragment;
+import com.onegravity.contactpicker.contact.ContactSortOrder;
 import com.onegravity.contactpicker.group.GroupFragment;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
@@ -29,15 +30,17 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     final private int mNumOfTabs;
 
+    final private ContactSortOrder mSortOrder;
     final private ContactPictureType mBadgeType;
     final private ContactDescription mDescription;
     final private int mDescriptionType;
 
-    public PagerAdapter(FragmentManager fm, int numOfTabs, ContactPictureType badgeType,
-                        ContactDescription description, int descriptionType) {
+    public PagerAdapter(FragmentManager fm, int numOfTabs, ContactSortOrder sortOrder,
+                        ContactPictureType badgeType, ContactDescription description, int descriptionType) {
         super(fm);
 
         mNumOfTabs = numOfTabs;
+        mSortOrder = sortOrder;
         mBadgeType = badgeType;
         mDescription = description;
         mDescriptionType = descriptionType;
@@ -47,7 +50,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ContactFragment.newInstance(mBadgeType, mDescription, mDescriptionType);
+                return ContactFragment.newInstance(mSortOrder, mBadgeType, mDescription, mDescriptionType);
             case 1:
                 return GroupFragment.newInstance();
             default: return null;

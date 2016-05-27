@@ -75,14 +75,19 @@ public class DemoActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
+
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
                                       ContactPictureType.ROUND.name())
+
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION,
-                                      ContactDescription.EMAIL.name())
+                                      ContactDescription.ADDRESS.name())
+
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,
                                       ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER,
                                       ContactSortOrder.AUTOMATIC.name());
+
                     startActivityForResult(intent, REQUEST_CONTACT);
                 }
             });

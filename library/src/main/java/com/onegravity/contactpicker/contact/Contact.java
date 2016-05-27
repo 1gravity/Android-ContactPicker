@@ -39,9 +39,26 @@ public interface Contact extends ContactElement {
 
 	String getAddress(int type);
 
+    /**
+     * The contact letter is used in the ContactBadge (if no contact picture can be found).
+     */
+    char getContactLetter();
+
+    /**
+     * The contact letter according to the sort order is used in the SectionIndexer for the fast
+     * scroll indicator.
+     */
+    char getContactLetter(ContactSortOrder sortOrder);
+
+    /**
+	 * The contact color is used in the ContactBadge (if no contact picture can be found) as
+	 * background color.
+	 */
+	int getContactColor();
+
 	/**
 	 * Unique key across all contacts that won't change even if the column id changes.
-     */
+	 */
 	String getLookupKey();
 
 	Uri getPhotoUri();

@@ -43,6 +43,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
     private View mRootLayout;
     private RecyclerView mRecyclerView;
     private View mFastScroll;
+    private View mSectionIndex;
     private View mEmptyView;
 
     @Override
@@ -76,6 +77,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
         mRootLayout = inflater.inflate(layoutId, null);
         mRecyclerView = (RecyclerView) mRootLayout.findViewById(android.R.id.list);
         mFastScroll = mRootLayout.findViewById(R.id.fast_scroller);
+        mSectionIndex = mRootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
         mEmptyView = mRootLayout.findViewById(android.R.id.empty);
 
         // use a LinearLayout for the RecyclerView
@@ -94,6 +96,9 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
         mRecyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         if (mFastScroll != null) {
             mFastScroll.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        }
+        if (mSectionIndex != null) {
+            mSectionIndex.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         }
         mEmptyView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
