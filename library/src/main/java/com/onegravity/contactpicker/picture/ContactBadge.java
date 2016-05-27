@@ -46,7 +46,6 @@ import android.view.View.OnClickListener;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.R;
 
@@ -109,8 +108,6 @@ public class ContactBadge extends View implements OnClickListener {
             mQueryHandler = new ContactBadgeQueryHandler(this, mExcludeMimes);
         }
         setOnClickListener(this);
-
-        mRoundContactPictures = ContactPickerActivity.getContactBadgeType() == ContactPictureType.ROUND;
 
         float density = Helper.getDisplayMetrics(context).density;
         mSizeInPx = Math.round(STANDARD_PICTURE_SIZE * density);
@@ -178,6 +175,10 @@ public class ContactBadge extends View implements OnClickListener {
     }
 
     // ****************************************** Contact Picture Methods *******************************************
+
+    public void setBadgeType(ContactPictureType contactPictureType) {
+        mRoundContactPictures = contactPictureType == ContactPictureType.ROUND;
+    }
 
     /**
      * The "key" is set by the ContactPictureManager to identify the ContactPictureLoader associated

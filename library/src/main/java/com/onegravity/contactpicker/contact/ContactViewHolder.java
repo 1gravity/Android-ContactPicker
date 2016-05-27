@@ -16,13 +16,13 @@
 
 package com.onegravity.contactpicker.contact;
 
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactBadge;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
@@ -38,9 +38,11 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
 
     final private ContactPictureType mContactPictureType;
     final private ContactDescription mContactDescription;
+    final private int mContactDescriptionType;
     final private ContactPictureManager mContactPictureLoader;
 
-    ContactViewHolder(View root, ContactPictureManager contactPictureLoader) {
+    ContactViewHolder(View root, ContactPictureManager contactPictureLoader, ContactPictureType contactPictureType,
+                      ContactDescription contactDescription, int contactDescriptionType) {
         super(root);
 
         mRoot = root;
@@ -49,9 +51,12 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         mBadge = (ContactBadge) root.findViewById(R.id.contact_badge);
         mSelect = (CheckBox) root.findViewById(R.id.select);
 
-        mContactPictureType = ContactPickerActivity.getContactBadgeType();
-        mContactDescription = ContactPickerActivity.getContactDescription();
+        mContactPictureType = contactPictureType;
+        mContactDescription = contactDescription;
+        mContactDescriptionType = contactDescriptionType;
         mContactPictureLoader = contactPictureLoader;
+
+        mBadge.setBadgeType(mContactPictureType);
     }
 
     void bind(final Contact contact) {
@@ -66,24 +71,26 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         mName.setText(contact.getDisplayName());
 
         // description
+        String description = "";
         switch (mContactDescription) {
             case EMAIL:
-                mDescription.setText(contact.getEmail());
+                description = contact.getEmail(mContactDescriptionType);
                 break;
             case PHONE:
-                mDescription.setText(contact.getPhone());
+                description = contact.getPhone(mContactDescriptionType);
                 break;
             case ADDRESS:
-                mDescription.setText(contact.getAddress());
+                description = contact.getAddress(mContactDescriptionType);
                 break;
         }
+        mDescription.setText(description);
 
         // contact picture
         if (mContactPictureType == ContactPictureType.NONE) {
             mBadge.setVisibility(View.GONE);
         }
         else {
-            String email = contact.getEmail();
+            String email = contact.getEmail(ContactsContract.CommonDataKinds.Email.TYPE_HOME);
             if (email != null) {
                 mBadge.assignContactFromEmail(email, true);
                 mContactPictureLoader.loadContactPicture(contact, mBadge);

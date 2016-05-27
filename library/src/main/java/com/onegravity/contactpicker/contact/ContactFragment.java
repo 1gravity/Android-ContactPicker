@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import com.onegravity.contactpicker.BaseFragment;
 import com.onegravity.contactpicker.R;
+import com.onegravity.contactpicker.picture.ContactPictureType;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -35,16 +36,38 @@ import java.util.List;
 
 public class ContactFragment extends BaseFragment {
 
+    private ContactPictureType mContactPictureType;
+    private ContactDescription mContactDescription;
+    private int mContactDescriptionType;
+
     // the list of all contacts
     private List<? extends Contact> mContacts = new ArrayList<>();
 
     private ContactAdapter mAdapter;
 
-    public static ContactFragment newInstance() {
-        return new ContactFragment();
+    public static ContactFragment newInstance(ContactPictureType contactPictureType,
+                                              ContactDescription contactDescription,
+                                              int contactDescriptionType) {
+        Bundle args = new Bundle();
+        args.putString("contactPictureType", contactPictureType.name());
+        args.putString("contactDescription", contactDescription.name());
+        args.putInt("contactDescriptionType", contactDescriptionType);
+        ContactFragment fragment = new ContactFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public ContactFragment() {}
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        mContactPictureType = ContactPictureType.lookup( args.getString("contactPictureType") );
+        mContactDescription = ContactDescription.lookup( args.getString("contactDescription") );
+        mContactDescriptionType = args.getInt("contactDescriptionType");
+    }
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +79,8 @@ public class ContactFragment extends BaseFragment {
         recyclerView.setLayoutManager(layoutManager);
 
         // create adapter for the RecyclerView
-        mAdapter = new ContactAdapter(rootLayout.getContext(), null);
+        mAdapter = new ContactAdapter(rootLayout.getContext(), null, mContactPictureType,
+                                      mContactDescription, mContactDescriptionType);
         recyclerView.setAdapter(mAdapter);
 
         return rootLayout;

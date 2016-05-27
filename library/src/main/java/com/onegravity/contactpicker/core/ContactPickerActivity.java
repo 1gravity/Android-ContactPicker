@@ -26,9 +26,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -42,12 +39,10 @@ import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
-import com.onegravity.contactpicker.contact.ContactFragment;
 import com.onegravity.contactpicker.contact.ContactSelectionChanged;
 import com.onegravity.contactpicker.contact.ContactSortOrder;
 import com.onegravity.contactpicker.contact.ContactsLoaded;
 import com.onegravity.contactpicker.group.Group;
-import com.onegravity.contactpicker.group.GroupFragment;
 import com.onegravity.contactpicker.group.GroupsLoaded;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
@@ -63,6 +58,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import static android.provider.ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS;
 
 public class ContactPickerActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -83,6 +80,43 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
 
     /**
+     * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
+     * parameter and uses the android.provider.ContactsContract.CommonDataKinds values
+     *
+     * If the description is PHONE then this parameter needs to match one of the
+     * ContactsContract.CommonDataKinds.Email.ContactsContract.CommonDataKinds.Phone.TYPE values:
+     *
+     * - TYPE_CUSTOM, TYPE_HOME, TYPE_MOBILE, TYPE_WORK, TYPE_FAX_WORK, TYPE_FAX_HOME, TYPE_PAGER
+     * - TYPE_OTHER, TYPE_CALLBACK, TYPE_CAR, TYPE_COMPANY_MAIN, TYPE_ISDN, TYPE_MAIN
+     * - TYPE_OTHER_FAX, TYPE_RADIO, TYPE_TELEX, TYPE_TTY_TDD, TYPE_WORK_MOBILE, TYPE_WORK_PAGER
+     * - TYPE_ASSISTANT, TYPE_MMS
+     *
+     * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.Phone.html)
+     *
+     * If the description is EMAIL then this parameter needs to match one of the
+     * ContactsContract.CommonDataKinds.Email.TYPE values:
+     *
+     * - TYPE_CUSTOM
+     * - TYPE_HOME
+     * - TYPE_WORK
+     * - TYPE_OTHER
+     * - TYPE_MOBILE
+     *
+     * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.Email.html)
+     *
+     * If the description is ADDRESS then this parameter needs to match one of the
+     * ContactsContract.CommonDataKinds.StructuredPostal.TYPE values:
+     *
+     * - TYPE_CUSTOM
+     * - TYPE_HOME
+     * - TYPE_WORK
+     * - TYPE_OTHER
+     *
+     * (https://developer.android.com/reference/android/provider/ContactsContract.CommonDataKinds.StructuredPostal.html)
+     */
+    public static final String EXTRA_CONTACT_DESCRIPTION_TYPE = "EXTRA_CONTACT_DESCRIPTION_TYPE";
+
+    /**
      * Use this to define the sorting order for contacts
      *
      * {@link com.onegravity.contactpicker.contact.ContactSortOrder}
@@ -94,15 +128,10 @@ public class ContactPickerActivity extends AppCompatActivity implements
      */
     public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
 
-    private static ContactPictureType sBadgeType = ContactPictureType.ROUND;
-    public static ContactPictureType getContactBadgeType() {
-        return sBadgeType;
-    }
+    private ContactPictureType mBadgeType = ContactPictureType.ROUND;
 
-    private static ContactDescription sDescription = ContactDescription.EMAIL;
-    public static ContactDescription getContactDescription() {
-        return sDescription;
-    }
+    private int mDescriptionType = ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
+    private ContactDescription mDescription = ContactDescription.ADDRESS;
 
     private ContactSortOrder mSortOrder = ContactSortOrder.AUTOMATIC;
 
@@ -171,45 +200,22 @@ public class ContactPickerActivity extends AppCompatActivity implements
         /*
          * Retrieve ContactPictureType.
          */
-        sBadgeType = ContactPictureType.ROUND;
         Intent intent = getIntent();
-        String tmp = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
-        if (tmp != null) {
-            try {
-                sBadgeType = ContactPictureType.valueOf(tmp);
-            }
-            catch (IllegalArgumentException e) {
-                Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_BADGE_TYPE value, defaulting to ROUND");
-            }
-        }
+        String enumName = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
+        mBadgeType = ContactPictureType.lookup(enumName);
 
         /*
          * Retrieve ContactDescription.
          */
-        sDescription = ContactDescription.EMAIL;
-        tmp = intent.getStringExtra(EXTRA_CONTACT_DESCRIPTION);
-        if (tmp != null) {
-            try {
-                sDescription = ContactDescription.valueOf(tmp);
-            }
-            catch (IllegalArgumentException e) {
-                Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_DESCRIPTION value, defaulting to EMAIL");
-            }
-        }
+        enumName = intent.getStringExtra(EXTRA_CONTACT_DESCRIPTION);
+        mDescription = ContactDescription.lookup(enumName);
+        mDescriptionType = intent.getIntExtra(EXTRA_CONTACT_DESCRIPTION_TYPE, ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME);
 
         /*
          * Retrieve ContactSortOrder.
          */
-        mSortOrder = ContactSortOrder.AUTOMATIC;
-        tmp = intent.getStringExtra(EXTRA_CONTACT_SORT_ORDER);
-        if (tmp != null) {
-            try {
-                mSortOrder = ContactSortOrder.valueOf(tmp);
-            }
-            catch (IllegalArgumentException e) {
-                Log.e(getClass().getSimpleName(), tmp + " is not a legal EXTRA_CONTACT_SORT_ORDER value, defaulting to AUTOMATIC");
-            }
-        }
+        enumName = intent.getStringExtra(EXTRA_CONTACT_SORT_ORDER);
+        mSortOrder = ContactSortOrder.lookup(enumName);
 
         setContentView(R.layout.contact_tab_layout);
 
@@ -228,7 +234,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
-        mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
+                                    mBadgeType, mDescription, mDescriptionType);
         viewPager.setAdapter(mAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
@@ -242,36 +249,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-    }
-
-    private static class PagerAdapter extends FragmentStatePagerAdapter {
-        private int mNumOfTabs;
-
-        private ContactFragment mContactFragment;
-        private GroupFragment mGroupFragment;
-
-        public PagerAdapter(FragmentManager fm, int numOfTabs) {
-            super(fm);
-            mNumOfTabs = numOfTabs;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    mContactFragment = ContactFragment.newInstance();
-                    return mContactFragment;
-                case 1:
-                    mGroupFragment = GroupFragment.newInstance();
-                    return mGroupFragment;
-                default: return null;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return mNumOfTabs;
-        }
     }
 
     @Override
@@ -388,14 +365,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
             ContactsContract.Data.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
             ContactsContract.Data.MIMETYPE,
-            ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
+            FORMATTED_ADDRESS,
             ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
-            ContactsContract.CommonDataKinds.StructuredPostal.STREET,
-            ContactsContract.CommonDataKinds.StructuredPostal.POBOX,
-            ContactsContract.CommonDataKinds.StructuredPostal.CITY,
-            ContactsContract.CommonDataKinds.StructuredPostal.REGION,
-            ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE,
-            ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY,
             ContactsContract.CommonDataKinds.Phone.NUMBER,
             ContactsContract.CommonDataKinds.Phone.TYPE,
             ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -412,7 +383,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private static final Uri GROUPS_URI = ContactsContract.Groups.CONTENT_URI;
     private static final String[] GROUPS_PROJECTION = new String[] {
             ContactsContract.Groups._ID,
-            ContactsContract.Groups.SOURCE_ID,
             ContactsContract.Groups.TITLE};
     private static final String GROUPS_SELECTION = ContactsContract.Groups.DELETED + " = 0";
     private static final String GROUPS_SORT = ContactsContract.Groups.TITLE + " COLLATE LOCALIZED ASC";
@@ -487,10 +457,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     };
 
     private void readContacts(Cursor cursor) {
-        Log.e("1gravity", "***************************************************************");
-        Log.e("1gravity", "* CONTACTS                                                    *");
-        Log.e("1gravity", "***************************************************************");
-
         mContacts.clear();
         mContactsByLookupKey.clear();
         mNrOfSelectedContacts = 0;
@@ -511,13 +477,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 mNrOfSelectedContacts += isChecked ? 1 : 0;
 
                 contact.addOnContactCheckedListener(mContactListener);
-
-                Log.e("1gravity", "lookupKey: " + lookupKey);
-                Log.e("1gravity", "id: " + contact.getId());
-                Log.e("1gravity", "displayName: " + contact.getDisplayName());
-                Log.e("1gravity", "first name: " + contact.getFirstName());
-                Log.e("1gravity", "last name: " + contact.getLastName());
-                Log.e("1gravity", "photoUri: " + contact.getPhotoUri());
 
                 // update the ui once some contacts have loaded
                 if (++count >= BATCH_SIZE) {
@@ -547,10 +506,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     }
 
     private void readContactDetails(Cursor cursor) {
-        Log.e("1gravity", "***************************************************************");
-        Log.e("1gravity", "* CONTACTS DETAILS                                            *");
-        Log.e("1gravity", "***************************************************************");
-
         if (cursor != null && cursor.moveToFirst()) {
             cursor.moveToPrevious();
             while (cursor.moveToNext()) {
@@ -571,48 +526,33 @@ public class ContactPickerActivity extends AppCompatActivity implements
         String mime = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
         if (mime.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
             String email = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
-            String type = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
-            if (email != null) contact.setEmail(email);
-            Log.e("1gravity", "  email: "  + email);
-            Log.e("1gravity", "  type: "  + type);
+            int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+            if (email != null) {
+                contact.setEmail(type, email);
+            }
         }
         else if (mime.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
             String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            String type = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-            contact.setPhone(phone);
-            Log.e("1gravity", "  phone: "  + phone);
-            Log.e("1gravity", "  type: "  + type);
+            int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+            if (phone != null) {
+                contact.setPhone(type, phone);
+            }
         }
         else if (mime.equals(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE)) {
-            String FORMATTED_ADDRESS = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS));
-            String TYPE = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
-            String STREET = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET));
-            String POBOX = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POBOX));
-            String CITY = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY));
-            String REGION = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION));
-            String POSTCODE = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE));
-            String COUNTRY = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY));
-            contact.setAddress(FORMATTED_ADDRESS.replaceAll("\\n", ", "));
-            Log.e("1gravity", "  FORMATTED_ADDRESS: "  + FORMATTED_ADDRESS);
-            Log.e("1gravity", "  TYPE: "  + TYPE);
-            Log.e("1gravity", "  STREET: "  + STREET);
-            Log.e("1gravity", "  POBOX: "  + POBOX);
-            Log.e("1gravity", "  CITY: "  + CITY);
-            Log.e("1gravity", "  POSTCODE: "  + POSTCODE);
-            Log.e("1gravity", "  REGION: "  + REGION);
-            Log.e("1gravity", "  COUNTRY: "  + COUNTRY);
+            String address = cursor.getString(cursor.getColumnIndex(FORMATTED_ADDRESS));
+            int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
+            if (address != null) {
+                contact.setAddress(type, address.replaceAll("\\n", ", "));
+            }
         }
         else if (mime.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
             String firstName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
             String lastName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
             if (firstName != null) contact.setFirstName(firstName);
             if (lastName != null) contact.setLastName(lastName);
-            Log.e("1gravity", "  first name: "  + firstName);
-            Log.e("1gravity", "  last name: "  + lastName);
         }
         else if (mime.equals(ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE)) {
             int groupId = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID));
-            Log.e("1gravity", "  groupId: "  + groupId);
             contact.addGroupId(groupId);
         }
     }
@@ -637,10 +577,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private List<GroupImpl> mVisibleGroups = new ArrayList<>();
 
     private void readGroups(Cursor cursor) {
-        Log.e("1gravity", "***************************************************************");
-        Log.e("1gravity", "* GROUPS                                                      *");
-        Log.e("1gravity", "***************************************************************");
-
         mGroups.clear();
         mGroupsById.clear();
         mVisibleGroups.clear();
@@ -657,10 +593,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 group.setChecked(isChecked, true);
 
                 group.addOnContactCheckedListener(mGroupListener);
-
-                Log.e("1gravity", "group " + group.getId() + ": " + group.getDisplayName());
-                String SOURCE_ID = cursor.getString(cursor.getColumnIndex(ContactsContract.Groups.SOURCE_ID));
-                Log.e("1gravity", "SOURCE_ID: " + SOURCE_ID);
             }
         }
 

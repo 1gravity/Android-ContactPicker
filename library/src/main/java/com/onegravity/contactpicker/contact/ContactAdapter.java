@@ -22,12 +22,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
@@ -36,17 +34,19 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     final private ContactPictureType mContactPictureType;
     final private ContactDescription mContactDescription;
+    final private int mContactDescriptionType;
     final private ContactPictureManager mContactPictureLoader;
 
     private LayoutInflater mInflater;
 
-    // position --> label
-    private LinkedHashMap<Integer, String> mSectionLabels;
-
-    public ContactAdapter(Context context, List<Contact> contacts) {
+    public ContactAdapter(Context context, List<Contact> contacts,
+                          ContactPictureType contactPictureType,
+                          ContactDescription contactDescription,
+                          int contactDescriptionType) {
         mContacts = contacts;
-        mContactPictureType = ContactPickerActivity.getContactBadgeType();
-        mContactDescription = ContactPickerActivity.getContactDescription();
+        mContactPictureType = contactPictureType;
+        mContactDescription = contactDescription;
+        mContactDescriptionType = contactDescriptionType;
         mContactPictureLoader = new ContactPictureManager(context, mContactPictureType == ContactPictureType.ROUND);
     }
 
@@ -62,7 +62,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
         }
 
         View view = mInflater.inflate(R.layout.contact_list_item, parent, false);
-        return new ContactViewHolder(view, mContactPictureLoader);
+        return new ContactViewHolder(view, mContactPictureLoader, mContactPictureType,
+                                     mContactDescription, mContactDescriptionType);
     }
 
     @Override

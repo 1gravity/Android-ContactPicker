@@ -23,7 +23,9 @@ import android.provider.ContactsContract;
 import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.contact.Contact;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,9 +48,9 @@ class ContactImpl extends ContactElementImpl implements Contact {
 
 	private String mFirstName = "";
 	private String mLastName = "";
-	private String mEmail = "";
-	private String mPhone = "";
-	private String mAddress = "";
+    private Map<Integer, String> mEmail = new HashMap<>();
+    private Map<Integer, String> mPhone = new HashMap<>();
+    private Map<Integer, String> mAddress = new HashMap<>();
 	transient private Uri mPhotoUri;
 	private Set<Long> mGroupIds = new HashSet<>();
 
@@ -70,19 +72,31 @@ class ContactImpl extends ContactElementImpl implements Contact {
 	}
 
 	@Override
-	public String getEmail() {
-		return mEmail;
+	public String getEmail(int type) {
+		String email = mEmail.get(type);
+        if (email == null && ! mEmail.isEmpty()) {
+            email = mEmail.values().iterator().next();
+        }
+        return  email;
 	}
 
 	@Override
-	public String getPhone() {
-		return mPhone;
-	}
+	public String getPhone(int type) {
+        String phone = mPhone.get(type);
+        if (phone == null && ! mPhone.isEmpty()) {
+            phone = mPhone.values().iterator().next();
+        }
+        return  phone;
+    }
 
 	@Override
-	public String getAddress() {
-		return mAddress;
-	}
+	public String getAddress(int type) {
+        String address = mAddress.get(type);
+        if (address == null && ! mAddress.isEmpty()) {
+            address = mAddress.values().iterator().next();
+        }
+        return  address;
+    }
 
 	@Override
 	public String getKey() {
@@ -107,16 +121,16 @@ class ContactImpl extends ContactElementImpl implements Contact {
 		mLastName = value;
 	}
 
-    void setEmail(String value) {
-		mEmail = value;
+    void setEmail(int type, String value) {
+		mEmail.put(type, value);
 	}
 
-    void setPhone(String value) {
-		mPhone = value;
+    void setPhone(int type, String value) {
+		mPhone.put(type, value);
 	}
 
-    void setAddress(String value) {
-		mAddress = value;
+    void setAddress(int type, String value) {
+		mAddress.put(type, value);
 	}
 
     void addGroupId(long value) {

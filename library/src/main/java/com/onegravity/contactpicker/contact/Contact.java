@@ -33,11 +33,11 @@ public interface Contact extends ContactElement {
 
 	String getLastName();
 
-	String getEmail();
+	String getEmail(int type);
 
-	String getPhone();
+	String getPhone(int type);
 
-	String getAddress();
+	String getAddress(int type);
 
 	String getKey();
 

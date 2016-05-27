@@ -19,6 +19,7 @@ package com.onegravity.contactpicker.demo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BulletSpan;
@@ -26,10 +27,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.onegravity.contactpicker.contact.ContactSortOrder;
-import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
+import com.onegravity.contactpicker.contact.ContactSortOrder;
+import com.onegravity.contactpicker.core.ContactPickerActivity;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
 import java.util.List;
@@ -52,9 +53,14 @@ public class DemoActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE, ContactPictureType.ROUND.name())
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION, ContactDescription.ADDRESS.name())
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER, ContactSortOrder.AUTOMATIC.name());
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
+                                      ContactPictureType.SQUARE.name())
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION,
+                                      ContactDescription.EMAIL.name())
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,
+                                      ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER,
+                                      ContactSortOrder.AUTOMATIC.name());
                     startActivityForResult(intent, REQUEST_CONTACT);
                 }
             });
