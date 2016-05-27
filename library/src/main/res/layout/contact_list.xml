@@ -9,6 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
+        android:id="@+id/fast_scroller"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"/>
+
     <TextView
         android:id="@android:id/empty"
         android:visibility="gone"

@@ -17,6 +17,7 @@
 package com.onegravity.contactpicker.contact;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 public class ContactFragment extends BaseFragment {
 
@@ -72,15 +75,15 @@ public class ContactFragment extends BaseFragment {
         mAdapter = new ContactAdapter(getContext(), null, mContactPictureType,
                                       mContactDescription, mContactDescriptionType);
 
-        return super.createView(inflater, R.layout.contact_list, mAdapter, mContacts);
-        /*VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) mRootLayout.findViewById(R.id.fast_scroller);
+        View rootLayout = super.createView(inflater, R.layout.contact_list, mAdapter, mContacts);
 
-        // Connect the recycler to the scroller (to let the scroller scroll the list)
+        // configure fast scroll
+        RecyclerView recyclerView = (RecyclerView) rootLayout.findViewById(android.R.id.list);
+        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootLayout.findViewById(R.id.fast_scroller);
         fastScroller.setRecyclerView(recyclerView);
-
-        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
         recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
-*/
+
+        return rootLayout;
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
