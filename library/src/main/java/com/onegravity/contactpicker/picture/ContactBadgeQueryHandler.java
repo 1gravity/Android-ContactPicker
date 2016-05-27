@@ -102,7 +102,7 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
 
         if (mCancelled) return;
 
-        mBadge.setContactUri(lookupUri);
+        mBadge.assignContactUri(lookupUri);
 
         Context context = mBadge.getContext();
         if (trigger && lookupUri != null) {

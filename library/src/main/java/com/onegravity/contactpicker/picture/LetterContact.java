@@ -61,13 +61,13 @@ public class LetterContact {
     }
 
     int getContactColor() {
-        String key = mContact.getKey();
+        String key = mContact.getDisplayName();
         int value = Helper.isNullOrEmpty(key) ? mContact.hashCode() : key.hashCode();
         return CONTACT_COLORS_MATERIAL[Math.abs(value) % CONTACT_COLORS_MATERIAL.length];
     }
 
     char getContactLetter() {
-        String key = mContact.getKey();
+        String key = mContact.getDisplayName();
         Matcher m = CONTACT_LETTER.matcher(key);
         String letter = m.matches() ? m.group(1).toUpperCase(Locale.US) : "?";
         return Helper.isNullOrEmpty(letter) ? '?' : letter.charAt(0);

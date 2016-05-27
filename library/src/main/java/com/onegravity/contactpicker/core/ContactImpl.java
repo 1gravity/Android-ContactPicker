@@ -37,15 +37,17 @@ class ContactImpl extends ContactElementImpl implements Contact {
 
     static ContactImpl fromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+		String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
 		String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
 		String[] names = displayName != null ? displayName.split("\\s+") : new String[]{"---", "---"};
 		String firstName = names.length >= 1 ? names[0] : displayName;
 		String lastName = names.length >= 2 ? names[1] : "";
 		String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
 		Uri uri = photoUri != null ? Uri.parse(photoUri) : null;
-		return new ContactImpl(id, displayName, firstName, lastName, uri);
+		return new ContactImpl(id, lookupKey, displayName, firstName, lastName, uri);
 	}
 
+	final private String mLookupKey;
 	private String mFirstName = "";
 	private String mLastName = "";
     private Map<Integer, String> mEmail = new HashMap<>();
@@ -54,8 +56,10 @@ class ContactImpl extends ContactElementImpl implements Contact {
 	transient private Uri mPhotoUri;
 	private Set<Long> mGroupIds = new HashSet<>();
 
-	private ContactImpl(long id, String displayName, String firstName, String lastName, Uri photoUri) {
+	private ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
 		super(id, displayName);
+
+		mLookupKey = lookupKey;
 		mFirstName = Helper.isNullOrEmpty(firstName) ? "---" : firstName;
 		mLastName = Helper.isNullOrEmpty(lastName) ? "---" : lastName;
 		mPhotoUri = photoUri;
@@ -98,9 +102,16 @@ class ContactImpl extends ContactElementImpl implements Contact {
         return  address;
     }
 
+	/**
+	 * Matches:
+	 * https://developer.android.com/reference/android/provider/ContactsContract.ContactsColumns.html#LOOKUP_KEY
+	 *
+	 * Used as unique key to cache contact pictures for a specific contact and also to create the
+	 * contact Uri: ContactsContract.Contacts.CONTENT_LOOKUP_URI + "/" + LOOKUP_KEY
+     */
 	@Override
-	public String getKey() {
-		return getDisplayName();
+	public String getLookupKey() {
+		return mLookupKey;
 	}
 
 	@Override

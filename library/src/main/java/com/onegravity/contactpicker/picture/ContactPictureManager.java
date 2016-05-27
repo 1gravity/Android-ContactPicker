@@ -63,7 +63,7 @@ public class ContactPictureManager {
      * </p>
      */
     public void loadContactPicture(Contact contact, ContactBadge badge) {
-        String key = contact.getKey();
+        String key = contact.getLookupKey();
 
         // retrieve or create uri for the contact picture
         Uri photoUri = contact.getPhotoUri();

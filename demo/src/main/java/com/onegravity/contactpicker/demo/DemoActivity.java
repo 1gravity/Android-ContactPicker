@@ -54,7 +54,7 @@ public class DemoActivity extends BaseActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
-                                      ContactPictureType.SQUARE.name())
+                                      ContactPictureType.ROUND.name())
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION,
                                       ContactDescription.EMAIL.name())
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,

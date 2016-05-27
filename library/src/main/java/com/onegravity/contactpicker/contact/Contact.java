@@ -39,7 +39,10 @@ public interface Contact extends ContactElement {
 
 	String getAddress(int type);
 
-	String getKey();
+	/**
+	 * Unique key across all contacts that won't change even if the column id changes.
+     */
+	String getLookupKey();
 
 	Uri getPhotoUri();
 

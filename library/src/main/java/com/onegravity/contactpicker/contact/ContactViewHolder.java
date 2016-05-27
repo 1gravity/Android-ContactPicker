@@ -16,6 +16,7 @@
 
 package com.onegravity.contactpicker.contact;
 
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -90,14 +91,13 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
             mBadge.setVisibility(View.GONE);
         }
         else {
-            String email = contact.getEmail(ContactsContract.CommonDataKinds.Email.TYPE_HOME);
-            if (email != null) {
-                mBadge.assignContactFromEmail(email, true);
-                mContactPictureLoader.loadContactPicture(contact, mBadge);
-                mBadge.setVisibility(View.VISIBLE);
-            }
-            else {
-                mBadge.setVisibility(View.INVISIBLE);
+            mContactPictureLoader.loadContactPicture(contact, mBadge);
+            mBadge.setVisibility(View.VISIBLE);
+
+            String lookupKey = contact.getLookupKey();
+            if (lookupKey != null) {
+                Uri contactUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                mBadge.assignContactUri(contactUri);
             }
         }
 
