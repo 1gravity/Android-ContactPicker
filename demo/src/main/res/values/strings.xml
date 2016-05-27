@@ -24,4 +24,7 @@
     <string name="permission_denied_contacts">The contact picker won\'t work without this permission. Are you sure you want to deny this permission?</string>
     <string name="permission_deny">Deny</string>
     <string name="permission_retry">Re-try</string>
+
+    <string name="light_theme">Light Theme</string>
+    <string name="dark_theme">Dark Theme</string>
 </resources>

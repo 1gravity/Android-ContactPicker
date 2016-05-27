@@ -19,11 +19,25 @@
 
     <!-- LIGHT Theme -->
     <style name="Theme_Light" parent="@style/ContactPicker_Theme_Light">
+        <!-- ActionBarCompat -->
+        <item name="colorPrimary">@color/colorPrimary_light</item>
+        <item name="colorAccent">@color/colorAccent_light</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+
+        <item name="backgroundColor">@color/background_light</item>
+        <item name="icTheme">@drawable/ic_palette_black_36dp</item>
         <item name="icPickContact">@drawable/ic_person_add_black_36dp</item>
     </style>
 
     <!-- DARK Theme -->
     <style name="Theme_Dark" parent="@style/ContactPicker_Theme_Dark">
+        <!-- ActionBarCompat -->
+        <item name="colorPrimary">@color/colorPrimary_dark</item>
+        <item name="colorAccent">@color/colorAccent_dark</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_dark</item>
+
+        <item name="backgroundColor">@color/background_dark</item>
+        <item name="icTheme">@drawable/ic_palette_white_36dp</item>
         <item name="icPickContact">@drawable/ic_person_add_white_36dp</item>
     </style>
 

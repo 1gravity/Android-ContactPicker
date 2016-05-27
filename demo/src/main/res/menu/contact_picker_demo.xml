@@ -15,12 +15,14 @@
   limitations under the License.
   -->
 
-<resources>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <declare-styleable name="Theme">
-        <attr name="icTheme" format="reference" />
-        <attr name="icPickContact" format="reference" />
-        <attr name="backgroundColor" format="color|reference" />
-    </declare-styleable>
+    <item
+        android:id="@+id/action_theme"
+        app:showAsAction="always"
+        android:icon="?attr/icTheme"
+        android:title="@string/light_theme"/>
 
-</resources>
+</menu>
