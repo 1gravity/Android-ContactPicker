@@ -17,8 +17,6 @@
 package com.onegravity.contactpicker.contact;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,19 +69,18 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootLayout = inflater.inflate(R.layout.contact_list, null);
-        RecyclerView recyclerView = (RecyclerView) rootLayout.findViewById(R.id.recycler_view);
-
-        // use a LinearLayout for the RecyclerView
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        // create adapter for the RecyclerView
-        mAdapter = new ContactAdapter(rootLayout.getContext(), null, mContactPictureType,
+        mAdapter = new ContactAdapter(getContext(), null, mContactPictureType,
                                       mContactDescription, mContactDescriptionType);
-        recyclerView.setAdapter(mAdapter);
 
-        return rootLayout;
+        return super.createView(inflater, R.layout.contact_list, mAdapter, mContacts);
+        /*VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) mRootLayout.findViewById(R.id.fast_scroller);
+
+        // Connect the recycler to the scroller (to let the scroller scroll the list)
+        fastScroller.setRecyclerView(recyclerView);
+
+        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
+        recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
+*/
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -92,6 +89,7 @@ public class ContactFragment extends BaseFragment {
 
         mContacts = event.getContacts();
         mAdapter.setData(mContacts);
+        updateEmptyViewVisibility(mContacts);
     }
 
     @Override

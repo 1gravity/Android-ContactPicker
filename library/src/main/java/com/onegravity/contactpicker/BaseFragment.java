@@ -19,13 +19,18 @@ package com.onegravity.contactpicker;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -34,6 +39,10 @@ import java.util.Locale;
 public abstract class BaseFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     private String[] mQueryStrings;
+
+    private View mRootLayout;
+    private RecyclerView mRecyclerView;
+    private View mEmptyView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +67,30 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
         super.onActivityCreated(savedInstanceState);
 
         setHasOptionsMenu(true);
+    }
+
+    protected final View createView(LayoutInflater inflater, int layoutId,
+                                    RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter,
+                                    List<? extends ContactElement> elements) {
+        mRootLayout = inflater.inflate(layoutId, null);
+        mRecyclerView = (RecyclerView) mRootLayout.findViewById(android.R.id.list);
+        mEmptyView = mRootLayout.findViewById(android.R.id.empty);
+
+        // use a LinearLayout for the RecyclerView
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        mRecyclerView.setAdapter(adapter);
+
+        updateEmptyViewVisibility(elements);
+
+        return mRootLayout;
+    }
+
+    protected void updateEmptyViewVisibility(List<? extends ContactElement> elements) {
+        boolean isEmpty = elements == null || elements.isEmpty();
+        mRecyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        mEmptyView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -89,7 +122,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if( item.getItemId() == R.id.action_check_all) {
+        if (item.getItemId() == R.id.action_check_all) {
             checkAll();
             return true;
         }
@@ -110,7 +143,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
     }
 
     private boolean onQuery(String query) {
-        String queryString = query.toString().toLowerCase( Locale.getDefault() );
+        String queryString = query.toString().toLowerCase(Locale.getDefault());
         mQueryStrings = queryString.split(" ");
         performFiltering(mQueryStrings);
         return true;

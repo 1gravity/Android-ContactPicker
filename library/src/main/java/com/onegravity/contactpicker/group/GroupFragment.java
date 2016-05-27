@@ -17,8 +17,6 @@
 package com.onegravity.contactpicker.group;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,18 +46,8 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootLayout = inflater.inflate(R.layout.group_list, null);
-        RecyclerView recyclerView = (RecyclerView) rootLayout.findViewById(R.id.recycler_view);
-
-        // use a LinearLayout for the RecyclerView
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        // create adapter for the RecyclerView
         mAdapter = new GroupAdapter(null);
-        recyclerView.setAdapter(mAdapter);
-
-        return rootLayout;
+        return super.createView(inflater, R.layout.group_list, mAdapter, mGroups);
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -68,6 +56,7 @@ public class GroupFragment extends BaseFragment {
 
         mGroups = event.getGroups();
         mAdapter.setData(mGroups);
+        updateEmptyViewVisibility(mGroups);
     }
 
     @Override
