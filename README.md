@@ -5,7 +5,7 @@
 The Android Contact Picker is a beautifully designed component to pick one or several contacts (including groups) from the Android contacts list.
 A demo app can be found here: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
-![Contact picker light theme](art/contact_list_light_framed_small?raw=true "Color picker dark theme") ![Contact picker dark theme](art/groups_list_dark_framed_small?raw=true "Color picker light theme")
+![Contact picker light theme](art/contact_list_light_framed_small.png?raw=true "Color picker dark theme") ![Contact picker dark theme](art/groups_list_dark_framed_small.png?raw=true "Color picker light theme")
 
 Setup
 -----
