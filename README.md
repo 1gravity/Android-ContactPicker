@@ -5,7 +5,8 @@
 The Android Contact Picker is a beautifully designed component to pick one or several contacts (including groups) from the Android contacts list.
 A demo app can be found here: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
-![Contact picker light theme](art/contact_list_light_framed_small.png?raw=true "Color picker dark theme") ![Contact picker dark theme](art/groups_list_dark_framed_small.png?raw=true "Color picker light theme")
+![Contact picker light theme](art/contact_list_light_framed_small.png?raw=true "Contact picker light theme")
+![Contact picker dark theme](art/groups_list_dark_framed_small.png?raw=true "Contact picker dark theme")
 
 Setup
 -----
@@ -27,6 +28,13 @@ If you use Proguard in your app, please add the following lines to your configur
     @org.greenrobot.eventbus.Subscribe <methods>;
 }
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+-keep public class * extends android.view.View {
+    public <init>(android.content.Context);
+    public <init>(android.content.Context, android.util.AttributeSet);
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+    public void set*(...);
+}
 ```
 
 ####**Theming**

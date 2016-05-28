@@ -50,12 +50,14 @@ android {
 }
 
 dependencies {
+    def supportLibVersion = '23.4.0'
+    def contactPickerVersion = '1.0.0'
+
     // use this to compile/run locally
     compile project(':library')
 
-    def supportLibVersion = '23.4.0'
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-
     // or this to use the latest published library
-    //compile 'com.1gravity:android-contactpicker:1.0.0'
+    //compile "com.1gravity:android-contactpicker:${contactPickerVersion}"
+
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
 }
