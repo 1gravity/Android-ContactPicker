@@ -105,6 +105,8 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     protected void checkAll() {
+        if (mContacts == null) return;
+
         // determine if all contacts are checked
         boolean allChecked = true;
         for (Contact contact : mContacts) {
@@ -129,6 +131,8 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     protected void performFiltering(String[] queryStrings) {
+        if (mContacts == null) return;
+
         List<Contact> filteredElements = new ArrayList<>();
         for (Contact contact : mContacts) {
             if (contact.matchesQuery(queryStrings)) {

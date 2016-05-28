@@ -61,6 +61,8 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     protected void checkAll() {
+        if (mGroups == null) return;
+
         // determine if all groups are checked
         boolean allChecked = true;
         for (Group group : mGroups) {
@@ -83,6 +85,8 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     protected void performFiltering(String[] queryStrings) {
+        if (mGroups == null) return;
+
         List<Group> filteredElements = new ArrayList<>();
         for (Group group : mGroups) {
             if (group.matchesQuery(queryStrings)) {

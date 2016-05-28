@@ -129,7 +129,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
 
     @Override
     public synchronized int getPositionForSection(int sectionPos) {
-        if (mSectionArray == null || mContacts == null) return 0;
+        if (mSections == null || mSections.isEmpty() ||
+            mContacts == null || mContacts.isEmpty()) return 0;
 
         int maxIndexSections = assertBoundaries(mSectionArray.length - 1, 0, mSectionArray.length);
         sectionPos = assertBoundaries(sectionPos, 0, maxIndexSections);
@@ -142,7 +143,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
 
     @Override
     public synchronized int getSectionForPosition(int contactPosition) {
-        if (mSectionArray == null || mContacts == null) return 0;
+        if (mSections == null || mSections.isEmpty() ||
+            mContacts == null || mContacts.isEmpty()) return 0;
+
         int maxIndexContacts = assertBoundaries(mContacts.size() - 1, 0, mContacts.size());
         contactPosition = assertBoundaries(contactPosition, 0, maxIndexContacts);
 
