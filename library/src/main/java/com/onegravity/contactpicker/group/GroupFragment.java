@@ -33,8 +33,17 @@ import java.util.List;
 
 public class GroupFragment extends BaseFragment {
 
-    // the list of all visible groups
+    /**
+     * The list of all visible groups.
+     * This is only used as a reference to the original data set while we actually use
+     * mFilteredGroups.
+     */
     private List<? extends Group> mGroups = new ArrayList<>();
+
+    /**
+     * The list of all visible and filtered groups.
+     */
+    private List<? extends Group> mFilteredGroups = new ArrayList<>();
 
     private GroupAdapter mAdapter;
 
@@ -55,17 +64,19 @@ public class GroupFragment extends BaseFragment {
         EventBus.getDefault().removeStickyEvent(event);
 
         mGroups = event.getGroups();
-        mAdapter.setData(mGroups);
+        mFilteredGroups = mGroups;
+        mAdapter.setData(mFilteredGroups);
+
         updateEmptyViewVisibility(mGroups);
     }
 
     @Override
     protected void checkAll() {
-        if (mGroups == null) return;
+        if (mFilteredGroups == null) return;
 
         // determine if all groups are checked
         boolean allChecked = true;
-        for (Group group : mGroups) {
+        for (Group group : mFilteredGroups) {
             if (! group.isChecked()) {
                 allChecked = false;
                 break;
@@ -74,7 +85,7 @@ public class GroupFragment extends BaseFragment {
 
         // if all are checked then un-check the groups, otherwise check them all
         boolean isChecked = ! allChecked;
-        for (Group group : mGroups) {
+        for (Group group : mFilteredGroups) {
             if (group.isChecked() != isChecked) {
                 group.setChecked(isChecked, false);
             }
@@ -87,14 +98,20 @@ public class GroupFragment extends BaseFragment {
     protected void performFiltering(String[] queryStrings) {
         if (mGroups == null) return;
 
-        List<Group> filteredElements = new ArrayList<>();
-        for (Group group : mGroups) {
-            if (group.matchesQuery(queryStrings)) {
-                filteredElements.add(group);
+        if (queryStrings == null || queryStrings.length == 0) {
+            mFilteredGroups = mGroups;
+        }
+        else {
+            List<Group> filteredElements = new ArrayList<>();
+            for (Group group : mGroups) {
+                if (group.matchesQuery(queryStrings)) {
+                    filteredElements.add(group);
+                }
             }
+            mFilteredGroups = filteredElements;
         }
 
-        mAdapter.setData(filteredElements);
+        mAdapter.setData(mFilteredGroups);
     }
 
 }

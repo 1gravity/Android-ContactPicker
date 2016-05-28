@@ -43,8 +43,17 @@ public class ContactFragment extends BaseFragment {
     private ContactDescription mDescription;
     private int mDescriptionType;
 
-    // the list of all contacts
+    /**
+     * The list of all contacts.
+     * This is only used as a reference to the original data set while we actually use
+     * mFilteredContacts.
+     */
     private List<? extends Contact> mContacts = new ArrayList<>();
+
+    /**
+     * The list of all visible and filtered contacts.
+     */
+    private List<? extends Contact> mFilteredContacts = new ArrayList<>();
 
     private ContactAdapter mAdapter;
 
@@ -99,17 +108,19 @@ public class ContactFragment extends BaseFragment {
         EventBus.getDefault().removeStickyEvent(event);
 
         mContacts = event.getContacts();
-        mAdapter.setData(mContacts);
+        mFilteredContacts = mContacts;
+        mAdapter.setData(mFilteredContacts);
+
         updateEmptyViewVisibility(mContacts);
     }
 
     @Override
     protected void checkAll() {
-        if (mContacts == null) return;
+        if (mFilteredContacts == null) return;
 
         // determine if all contacts are checked
         boolean allChecked = true;
-        for (Contact contact : mContacts) {
+        for (Contact contact : mFilteredContacts) {
             if (! contact.isChecked()) {
                 allChecked = false;
                 break;
@@ -118,7 +129,7 @@ public class ContactFragment extends BaseFragment {
 
         // if all are checked then un-check the contacts, otherwise check them all
         boolean isChecked = ! allChecked;
-        for (Contact contact : mContacts) {
+        for (Contact contact : mFilteredContacts) {
             if (contact.isChecked() != isChecked) {
                 contact.setChecked(isChecked, true);
             }
@@ -133,14 +144,20 @@ public class ContactFragment extends BaseFragment {
     protected void performFiltering(String[] queryStrings) {
         if (mContacts == null) return;
 
-        List<Contact> filteredElements = new ArrayList<>();
-        for (Contact contact : mContacts) {
-            if (contact.matchesQuery(queryStrings)) {
-                filteredElements.add(contact);
+        if (queryStrings == null || queryStrings.length == 0) {
+            mFilteredContacts = mContacts;
+        }
+        else {
+            List<Contact> filteredElements = new ArrayList<>();
+            for (Contact contact : mContacts) {
+                if (contact.matchesQuery(queryStrings)) {
+                    filteredElements.add(contact);
+                }
             }
+            mFilteredContacts = filteredElements;
         }
 
-        mAdapter.setData(filteredElements);
+        mAdapter.setData(mFilteredContacts);
     }
 
 }
