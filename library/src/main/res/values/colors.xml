@@ -17,6 +17,10 @@
 
 <resources>
     <!-- Light Colors -->
+    <color name="colorPrimary_light">#FFE0B2</color>
+    <color name="colorPrimaryDark_light">#FFA726</color>
+    <color name="colorAccent_light">#424242</color>
+
     <color name="text_color_primary_light">#FF212121</color>
     <color name="text_color_secondary_light">#FFBDBDBD</color>
     <color name="contact_badge_line_light">#ffffffff</color>
@@ -24,6 +28,10 @@
     <color name="contact_badge_overlay_light">#aa888888</color>
 
     <!-- Dark Colors -->
+    <color name="colorPrimary_dark">#2E7D32</color>
+    <color name="colorPrimaryDark_dark">#1B5E20</color>
+    <color name="colorAccent_dark">#FAFAFA</color>
+
     <color name="text_color_primary_dark">#FFFAFAFA</color>
     <color name="text_color_secondary_dark">#FF9E9E9E</color>
     <color name="contact_badge_line_dark">#ff000000</color>

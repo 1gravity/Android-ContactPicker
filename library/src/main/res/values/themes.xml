@@ -19,6 +19,11 @@
 
     <!-- LIGHT Theme -->
     <style name="ContactPicker_Theme_Light" parent="@style/Theme.AppCompat.Light">
+        <!-- ActionBarCompat -->
+        <item name="colorPrimary">@color/colorPrimary_light</item>
+        <item name="colorAccent">@color/colorAccent_light</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+
         <item name="textColorPrimary">@color/text_color_primary_light</item>
         <item name="textColorSecondary">@color/text_color_secondary_light</item>
 
@@ -35,6 +40,11 @@
 
     <!-- DARK Theme -->
     <style name="ContactPicker_Theme_Dark" parent="@style/Theme.AppCompat">
+        <!-- ActionBarCompat -->
+        <item name="colorPrimary">@color/colorPrimary_dark</item>
+        <item name="colorAccent">@color/colorAccent_dark</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_dark</item>
+
         <item name="textColorPrimary">@color/text_color_primary_dark</item>
         <item name="textColorSecondary">@color/text_color_secondary_dark</item>
 

@@ -19,7 +19,7 @@
 
     <!-- LIGHT Theme -->
     <style name="Theme_Light" parent="@style/ContactPicker_Theme_Light">
-        <!-- ActionBarCompat -->
+        <!-- ActionBarCompat (these override the default colors of the ContactPicker -->
         <item name="colorPrimary">@color/colorPrimary_light</item>
         <item name="colorAccent">@color/colorAccent_light</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
@@ -31,7 +31,7 @@
 
     <!-- DARK Theme -->
     <style name="Theme_Dark" parent="@style/ContactPicker_Theme_Dark">
-        <!-- ActionBarCompat -->
+        <!-- ActionBarCompat (these override the default colors of the ContactPicker -->
         <item name="colorPrimary">@color/colorPrimary_dark</item>
         <item name="colorAccent">@color/colorAccent_dark</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_dark</item>
