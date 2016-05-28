@@ -40,12 +40,12 @@ import java.util.List;
 
 public class DemoActivity extends BaseActivity {
 
-    private static final String EXTRA_LIGHT_THEME = "EXTRA_LIGHT_THEME";
+    private static final String EXTRA_DARK_THEME = "EXTRA_DARK_THEME";
     private static final String EXTRA_CONTACTS = "EXTRA_CONTACTS";
 
     private static final int REQUEST_CONTACT = 0;
 
-    private boolean mUseLightTheme;
+    private boolean mDarkTheme;
     private List<Contact> mContacts;
 
     @Override
@@ -54,16 +54,16 @@ public class DemoActivity extends BaseActivity {
 
         // read parameters either from the Intent or from the Bundle
         if (savedInstanceState != null) {
-            mUseLightTheme = savedInstanceState.getBoolean("mUseLightTheme");
+            mDarkTheme = savedInstanceState.getBoolean("mDarkTheme");
             mContacts = (List<Contact>) savedInstanceState.getSerializable("mContacts");
         }
         else {
             Intent intent = getIntent();
-            mUseLightTheme = intent.getBooleanExtra(EXTRA_LIGHT_THEME, false);
+            mDarkTheme = intent.getBooleanExtra(EXTRA_DARK_THEME, false);
             mContacts = (List<Contact>) intent.getSerializableExtra(EXTRA_CONTACTS);
         }
 
-        setTheme(mUseLightTheme ? R.style.Theme_Light : R.style.Theme_Dark);
+        setTheme(mDarkTheme ? R.style.Theme_Dark : R.style.Theme_Light);
 
         // set layout
         setContentView(R.layout.main);
@@ -75,6 +75,7 @@ public class DemoActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
+                            .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ? "dark" : "light")
 
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
                                       ContactPictureType.ROUND.name())
@@ -104,7 +105,7 @@ public class DemoActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean("mUseLightTheme", mUseLightTheme);
+        outState.putBoolean("mDarkTheme", mDarkTheme);
         if (mContacts != null) {
             outState.putSerializable("mContacts", (Serializable) mContacts);
         }
@@ -156,7 +157,7 @@ public class DemoActivity extends BaseActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        int textId = mUseLightTheme ? R.string.dark_theme : R.string.light_theme;
+        int textId = mDarkTheme ? R.string.light_theme : R.string.dark_theme;
         menu.findItem(R.id.action_theme).setTitle(textId);
         return true;
     }
@@ -164,9 +165,9 @@ public class DemoActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_theme) {
-            mUseLightTheme = ! mUseLightTheme;
+            mDarkTheme = ! mDarkTheme;
             Intent intent = new Intent(this, this.getClass())
-                    .putExtra(EXTRA_LIGHT_THEME, mUseLightTheme);
+                    .putExtra(EXTRA_DARK_THEME, mDarkTheme);
             if (mContacts != null) {
                 intent.putExtra(EXTRA_CONTACTS, (Serializable) mContacts);
             }

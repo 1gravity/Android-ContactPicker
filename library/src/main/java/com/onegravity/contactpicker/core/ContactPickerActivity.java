@@ -65,6 +65,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
+     * If this is set to "dark" (case-insensitive) then the dark theme will be used
+     * (based on Theme.AppCompat). If the parameter isn't set or it's set to anything else than
+     * "dark", the light theme will be used (based on Theme.AppCompat.Light).
+     */
+    public static final String EXTRA_THEME = "EXTRA_THEME";
+
+    /**
      * Use this parameter to determine whether the contact picture shows a contact badge and if yes
      * what type (round, square).
      *
@@ -128,6 +135,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
      */
     public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
 
+    private boolean mDarkTheme;
+
     private ContactPictureType mBadgeType = ContactPictureType.ROUND;
 
     private int mDescriptionType = ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
@@ -173,10 +182,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
             return;
         }
 
-        /*
-         * Retrieve default title used if no contacts are selected.
-         */
+        Intent intent = getIntent();
         if (savedInstanceState == null) {
+            /*
+             * Retrieve default title used if no contacts are selected.
+             */
             try {
                 PackageManager pkMgr = getPackageManager();
                 ActivityInfo activityInfo = pkMgr.getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
@@ -185,9 +195,14 @@ public class ContactPickerActivity extends AppCompatActivity implements
             catch (PackageManager.NameNotFoundException ignore) {
                 mDefaultTitle = getTitle().toString();
             }
+
+            String darkTheme = intent.getStringExtra(EXTRA_THEME);
+            mDarkTheme = darkTheme != null && "dark".equalsIgnoreCase(darkTheme);
         }
         else {
             mDefaultTitle = savedInstanceState.getString("mDefaultTitle");
+
+            mDarkTheme = savedInstanceState.getBoolean("mDarkTheme");
 
             // Retrieve selected contact and group ids.
             try {
@@ -200,7 +215,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
         /*
          * Retrieve ContactPictureType.
          */
-        Intent intent = getIntent();
         String enumName = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
         mBadgeType = ContactPictureType.lookup(enumName);
 
@@ -217,6 +231,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         enumName = intent.getStringExtra(EXTRA_CONTACT_SORT_ORDER);
         mSortOrder = ContactSortOrder.lookup(enumName);
 
+        setTheme(mDarkTheme ? R.style.ContactPicker_Theme_Dark : R.style.ContactPicker_Theme_Light);
         setContentView(R.layout.contact_tab_layout);
 
         // initialize TabLayout
@@ -273,6 +288,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
         super.onSaveInstanceState(outState);
 
         outState.putString("mDefaultTitle", mDefaultTitle);
+
+        outState.putBoolean("mDarkTheme", mDarkTheme);
 
         mSelectedContactIds.clear();;
         for (Contact contact : mContacts) {
