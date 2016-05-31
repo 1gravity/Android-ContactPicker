@@ -65,9 +65,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
-     * If this is set to "dark" (case-insensitive) then the dark theme will be used
-     * (based on Theme.AppCompat). If the parameter isn't set or it's set to anything else than
-     * "dark", the light theme will be used (based on Theme.AppCompat.Light).
+     * Use this parameter to set the Theme for this activity.
+     * It's the theme's resource id (like R.style.YourFancyTheme)..
+     * Please note that the theme needs to define the attributes defined in attrs.xml or the
+     * Activity will crash. You can either extend the library's theme(s) or define the attributes in
+     * your custom theme.
      */
     public static final String EXTRA_THEME = "EXTRA_THEME";
 
@@ -135,7 +137,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
      */
     public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
 
-    private boolean mDarkTheme;
+    private int mThemeResId;
 
     private ContactPictureType mBadgeType = ContactPictureType.ROUND;
 
@@ -196,13 +198,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 mDefaultTitle = getTitle().toString();
             }
 
-            String darkTheme = intent.getStringExtra(EXTRA_THEME);
-            mDarkTheme = darkTheme != null && "dark".equalsIgnoreCase(darkTheme);
+            mThemeResId = intent.getIntExtra(EXTRA_THEME, R.style.ContactPicker_Theme_Light);
         }
         else {
             mDefaultTitle = savedInstanceState.getString("mDefaultTitle");
 
-            mDarkTheme = savedInstanceState.getBoolean("mDarkTheme");
+            mThemeResId = savedInstanceState.getInt("mThemeResId");
 
             // Retrieve selected contact and group ids.
             try {
@@ -231,7 +232,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         enumName = intent.getStringExtra(EXTRA_CONTACT_SORT_ORDER);
         mSortOrder = ContactSortOrder.lookup(enumName);
 
-        setTheme(mDarkTheme ? R.style.ContactPicker_Theme_Dark : R.style.ContactPicker_Theme_Light);
+        setTheme(mThemeResId);
         setContentView(R.layout.cp_contact_tab_layout);
 
         // initialize TabLayout
@@ -289,7 +290,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         outState.putString("mDefaultTitle", mDefaultTitle);
 
-        outState.putBoolean("mDarkTheme", mDarkTheme);
+        outState.putInt("mThemeResId", mThemeResId);
 
         mSelectedContactIds.clear();;
         for (Contact contact : mContacts) {

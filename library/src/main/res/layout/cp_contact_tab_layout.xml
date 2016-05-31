@@ -8,8 +8,8 @@
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabContent"
-        app:tabTextColor="?attr/textColorSecondary"
-        app:tabSelectedTextColor="?attr/textColorPrimary"
+        app:tabTextColor="?attr/cp_textColorSecondary"
+        app:tabSelectedTextColor="?attr/cp_textColorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

@@ -17,45 +17,35 @@
 
 <resources>
 
-    <!-- LIGHT Theme -->
+   <!-- LIGHT Theme -->
     <style name="ContactPicker_Theme_Light" parent="@style/Theme.AppCompat.Light">
-        <!-- ActionBarCompat -->
-        <item name="colorPrimary">@color/colorPrimary_light</item>
-        <item name="colorAccent">@color/colorAccent_light</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+        <item name="cp_textColorPrimary">@color/text_color_primary_light</item>
+        <item name="cp_textColorSecondary">@color/text_color_secondary_light</item>
 
-        <item name="textColorPrimary">@color/text_color_primary_light</item>
-        <item name="textColorSecondary">@color/text_color_secondary_light</item>
+        <item name="cp_badgeLineColor">@color/contact_badge_line_light</item>
+        <item name="cp_badgeTriangleColor">@color/contact_badge_triangle_light</item>
+        <item name="cp_badgeOverlayColor">@color/contact_badge_overlay_light</item>
 
-        <item name="contactBadgeLineColor">@color/contact_badge_line_light</item>
-        <item name="contactBadgeTriangleColor">@color/contact_badge_triangle_light</item>
-        <item name="contactBadgeOverlayColor">@color/contact_badge_overlay_light</item>
-
-        <item name="contactBadge_icMenuOK">@drawable/ic_check_black_36dp</item>
-        <item name="contactBadge_icMenuCancel">@drawable/ic_close_black_36dp</item>
-        <item name="contactBadge_icMenuCheckAll">@drawable/ic_apps_black_36dp</item>
-        <item name="contactBadge_icMenuSearch">@drawable/ic_search_black_36dp</item>
+        <item name="cp_actionIconOK">@drawable/ic_check_black_36dp</item>
+        <item name="cp_actionIconCancel">@drawable/ic_close_black_36dp</item>
+        <item name="cp_actionIconCheckAll">@drawable/ic_apps_black_36dp</item>
+        <item name="cp_actionIconSearch">@drawable/ic_search_black_36dp</item>
 
     </style>
 
     <!-- DARK Theme -->
     <style name="ContactPicker_Theme_Dark" parent="@style/Theme.AppCompat">
-        <!-- ActionBarCompat -->
-        <item name="colorPrimary">@color/colorPrimary_dark</item>
-        <item name="colorAccent">@color/colorAccent_dark</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_dark</item>
+        <item name="cp_textColorPrimary">@color/text_color_primary_dark</item>
+        <item name="cp_textColorSecondary">@color/text_color_secondary_dark</item>
 
-        <item name="textColorPrimary">@color/text_color_primary_dark</item>
-        <item name="textColorSecondary">@color/text_color_secondary_dark</item>
+        <item name="cp_badgeLineColor">@color/contact_badge_line_dark</item>
+        <item name="cp_badgeTriangleColor">@color/contact_badge_triangle_dark</item>
+        <item name="cp_badgeOverlayColor">@color/contact_badge_overlay_dark</item>
 
-        <item name="contactBadgeLineColor">@color/contact_badge_line_dark</item>
-        <item name="contactBadgeTriangleColor">@color/contact_badge_triangle_dark</item>
-        <item name="contactBadgeOverlayColor">@color/contact_badge_overlay_dark</item>
-
-        <item name="contactBadge_icMenuOK">@drawable/ic_check_white_36dp</item>
-        <item name="contactBadge_icMenuCancel">@drawable/ic_close_white_36dp</item>
-        <item name="contactBadge_icMenuCheckAll">@drawable/ic_apps_white_36dp</item>
-        <item name="contactBadge_icMenuSearch">@drawable/ic_search_white_36dp</item>
+        <item name="cp_actionIconOK">@drawable/ic_check_white_36dp</item>
+        <item name="cp_actionIconCancel">@drawable/ic_close_white_36dp</item>
+        <item name="cp_actionIconCheckAll">@drawable/ic_apps_white_36dp</item>
+        <item name="cp_actionIconSearch">@drawable/ic_search_white_36dp</item>
     </style>
 
 </resources>

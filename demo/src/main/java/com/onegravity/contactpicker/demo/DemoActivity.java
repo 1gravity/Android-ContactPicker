@@ -75,7 +75,8 @@ public class DemoActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
-                            .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ? "dark" : "light")
+                            .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ?
+                                    R.style.Theme_Dark : R.style.Theme_Light)
 
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
                                       ContactPictureType.ROUND.name())

@@ -23,19 +23,19 @@
         android:id="@+id/action_search"
         app:showAsAction="ifRoom|withText|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        android:icon="?attr/contactBadge_icMenuSearch"
+        android:icon="?attr/cp_actionIconSearch"
         android:title="@android:string/search_go"/>
 
     <item
         android:id="@+id/action_check_all"
         app:showAsAction="ifRoom|withText"
-        android:icon="?attr/contactBadge_icMenuCheckAll"
+        android:icon="?attr/cp_actionIconCheckAll"
         android:title="@android:string/selectAll"/>
 
     <item
         android:id="@+id/action_done"
         app:showAsAction="ifRoom|withText"
-        android:icon="?attr/contactBadge_icMenuOK"
+        android:icon="?attr/cp_actionIconOK"
         android:title="@android:string/ok"/>
 
 </menu>

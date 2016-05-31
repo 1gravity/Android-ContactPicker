@@ -166,7 +166,7 @@ public class ContactBadge extends View implements OnClickListener {
             mTriangle = new ShapeDrawable(new PathShape(chipPath, 500f, 500f));
             mTriangle.setDither(true);
             int triangleColor = Color.parseColor("#cc1f1f1f");
-            if (theme.resolveAttribute(R.attr.contactBadgeTriangleColor, typedValue, true)) {
+            if (theme.resolveAttribute(R.attr.cp_badgeTriangleColor, typedValue, true)) {
                 triangleColor = typedValue.data;
             }
             mTriangle.getPaint().setColor(triangleColor);
@@ -174,7 +174,7 @@ public class ContactBadge extends View implements OnClickListener {
             // line
             mLinePaint = new Paint();
             int lineColor = Color.parseColor("#ffffffff");
-            if (theme.resolveAttribute(R.attr.contactBadgeLineColor, typedValue, true)) {
+            if (theme.resolveAttribute(R.attr.cp_badgeLineColor, typedValue, true)) {
                 lineColor = typedValue.data;
             }
             mLinePaint.setColor(lineColor);
@@ -192,7 +192,7 @@ public class ContactBadge extends View implements OnClickListener {
 
         mPressedOverlay = new ShapeDrawable(shape);
         int overlayColor = Color.parseColor("#aa888888");
-        if (theme.resolveAttribute(R.attr.contactBadgeOverlayColor, typedValue, true)) {
+        if (theme.resolveAttribute(R.attr.cp_badgeOverlayColor, typedValue, true)) {
             overlayColor = typedValue.data;
         }
         Paint paint = mPressedOverlay.getPaint();

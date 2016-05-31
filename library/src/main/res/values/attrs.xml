@@ -18,17 +18,17 @@
 <resources>
 
     <declare-styleable name="Theme">
-        <attr name="textColorPrimary" format="color|reference"/>
-        <attr name="textColorSecondary" format="color|reference"/>
+        <attr name="cp_textColorPrimary" format="color|reference"/>
+        <attr name="cp_textColorSecondary" format="color|reference"/>
 
-        <attr name="contactBadgeLineColor" format="reference" />
-        <attr name="contactBadgeTriangleColor" format="reference" />
-        <attr name="contactBadgeOverlayColor" format="reference" />
+        <attr name="cp_badgeLineColor" format="reference" />
+        <attr name="cp_badgeTriangleColor" format="reference" />
+        <attr name="cp_badgeOverlayColor" format="reference" />
 
-        <attr name="contactBadge_icMenuOK" format="reference" />
-        <attr name="contactBadge_icMenuCancel" format="reference" />
-        <attr name="contactBadge_icMenuCheckAll" format="reference" />
-        <attr name="contactBadge_icMenuSearch" format="reference" />
+        <attr name="cp_actionIconOK" format="reference" />
+        <attr name="cp_actionIconCancel" format="reference" />
+        <attr name="cp_actionIconCheckAll" format="reference" />
+        <attr name="cp_actionIconSearch" format="reference" />
     </declare-styleable>
 
 </resources>
