@@ -24,6 +24,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.picture.ContactBadge;
 import com.onegravity.contactpicker.picture.ContactPictureManager;
@@ -85,6 +86,7 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
                 break;
         }
         mDescription.setText(description);
+        mDescription.setVisibility( Helper.isNullOrEmpty(description) ? View.GONE : View.VISIBLE );
 
         // contact picture
         if (mContactPictureType == ContactPictureType.NONE) {

@@ -30,7 +30,6 @@
         <item name="cp_actionIconCancel">@drawable/ic_close_black_36dp</item>
         <item name="cp_actionIconCheckAll">@drawable/ic_apps_black_36dp</item>
         <item name="cp_actionIconSearch">@drawable/ic_search_black_36dp</item>
-
     </style>
 
     <!-- DARK Theme -->
