@@ -56,7 +56,7 @@ public class GroupFragment extends BaseFragment {
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAdapter = new GroupAdapter(null);
-        return super.createView(inflater, R.layout.group_list, mAdapter, mGroups);
+        return super.createView(inflater, R.layout.cp_group_list, mAdapter, mGroups);
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)

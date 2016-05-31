@@ -232,7 +232,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mSortOrder = ContactSortOrder.lookup(enumName);
 
         setTheme(mDarkTheme ? R.style.ContactPicker_Theme_Dark : R.style.ContactPicker_Theme_Light);
-        setContentView(R.layout.contact_tab_layout);
+        setContentView(R.layout.cp_contact_tab_layout);
 
         // initialize TabLayout
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabContent);
@@ -240,11 +240,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         TabLayout.Tab tabContacts = tabLayout.newTab();
-        tabContacts.setText(R.string.contact_tab_title);
+        tabContacts.setText(R.string.cp_contact_tab_title);
         tabLayout.addTab(tabContacts);
 
         TabLayout.Tab tabGroups = tabLayout.newTab();
-        tabGroups.setText(R.string.group_tab_title);
+        tabGroups.setText(R.string.cp_group_tab_title);
         tabLayout.addTab(tabGroups);
 
         // initialize ViewPager
@@ -313,7 +313,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
             setTitle(mDefaultTitle);
         }
         else {
-            String title = getString(R.string.actionmode_selected, mNrOfSelectedContacts);
+            String title = getString(R.string.cp_actionmode_selected, mNrOfSelectedContacts);
             setTitle(title);
         }
     }
@@ -322,7 +322,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.contact_picker, menu);
+        getMenuInflater().inflate(R.menu.cp_contact_picker, menu);
         return true;
     }
 

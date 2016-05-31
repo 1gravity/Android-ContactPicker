@@ -119,7 +119,6 @@ public class DemoActivity extends BaseActivity {
             // we got a result from the contact picker --> show the picked contacts
             mContacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
             populateContactList(mContacts);
-
         }
     }
 

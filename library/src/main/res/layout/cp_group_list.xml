@@ -17,6 +17,6 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/no_groups"/>
+        android:text="@string/cp_no_groups"/>
 
 </RelativeLayout>

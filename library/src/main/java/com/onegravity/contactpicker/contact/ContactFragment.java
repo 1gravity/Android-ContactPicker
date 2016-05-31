@@ -88,7 +88,7 @@ public class ContactFragment extends BaseFragment {
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAdapter = new ContactAdapter(getContext(), null, mSortOrder, mPictureType, mDescription, mDescriptionType);
 
-        View rootLayout = super.createView(inflater, R.layout.contact_list, mAdapter, mContacts);
+        View rootLayout = super.createView(inflater, R.layout.cp_contact_list, mAdapter, mContacts);
 
         // configure fast scroll
         RecyclerView recyclerView = (RecyclerView) rootLayout.findViewById(android.R.id.list);

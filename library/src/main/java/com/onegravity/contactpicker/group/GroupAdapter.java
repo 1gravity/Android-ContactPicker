@@ -47,7 +47,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {
             mInflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
-        View view = mInflater.inflate(R.layout.group_list_item, parent, false);
+        View view = mInflater.inflate(R.layout.cp_group_list_item, parent, false);
         return new GroupViewHolder(view);
     }
 

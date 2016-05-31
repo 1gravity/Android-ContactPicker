@@ -69,7 +69,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
             mInflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
-        View view = mInflater.inflate(R.layout.contact_list_item, parent, false);
+        View view = mInflater.inflate(R.layout.cp_contact_list_item, parent, false);
         return new ContactViewHolder(view, mContactPictureLoader, mContactPictureType,
                                      mContactDescription, mContactDescriptionType);
     }

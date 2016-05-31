@@ -16,21 +16,17 @@
   -->
 
 <resources>
-    <string name="contact_tab_title">Contacts</string>
-    <string name="group_tab_title">Groups</string>
+    <string name="cp_contact_tab_title">Contacts</string>
+    <string name="cp_group_tab_title">Groups</string>
 
-    <string name="no_contacts">No Contacts</string>
-    <string name="no_groups">No Groups</string>
+    <string name="cp_no_contacts">No Contacts</string>
+    <string name="cp_no_groups">No Groups</string>
 
     <plurals
-        name="group_description">
+        name="cp_group_description">
         <item quantity="one">(%1$d contact)</item>
         <item quantity="other">(%1$d contacts)</item>
     </plurals>
 
-    <string name="actionmode_selected">%d selected</string>
-
-    <string name="action_search">Search</string>
-
-    <string name="action_select_all">Select all</string>
+    <string name="cp_actionmode_selected">%d selected</string>
 </resources>

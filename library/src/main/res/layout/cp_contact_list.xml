@@ -34,6 +34,6 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/no_contacts"/>
+        android:text="@string/cp_no_contacts"/>
 
 </RelativeLayout>

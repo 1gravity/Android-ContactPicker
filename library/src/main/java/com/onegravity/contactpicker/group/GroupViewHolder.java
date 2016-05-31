@@ -58,7 +58,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
         // description
         Collection<Contact> contacts = group.getContacts();
         Resources res = mRoot.getContext().getResources();
-        String desc = res.getQuantityString(R.plurals.group_description, contacts.size(), contacts.size());
+        String desc = res.getQuantityString(R.plurals.cp_group_description, contacts.size(), contacts.size());
         mDescription.setText(desc);
 
         // check box
