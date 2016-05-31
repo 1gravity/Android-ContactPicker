@@ -19,7 +19,7 @@ package com.onegravity.contactpicker.picture;
 import android.provider.ContactsContract;
 
 /**
- * Some constans used in the ContactBadge and the ContactBadgeQueryHandler.
+ * Some constans used in the ContactBadge and the ContactQueryHandler.
  */
 class Constants {
 

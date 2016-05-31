@@ -18,7 +18,6 @@ package com.onegravity.contactpicker.picture;
 
 import android.content.AsyncQueryHandler;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,25 +26,29 @@ import android.util.Log;
 
 import com.onegravity.contactpicker.Helper;
 
-public class ContactBadgeQueryHandler extends AsyncQueryHandler {
+public class ContactQueryHandler extends AsyncQueryHandler {
 
-    private final ContactBadge mBadge;
+    public interface ContactQueryHandlerCallback {
+        void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri);
+    }
+
     private final String[] mExcludeMimes;
 
     private int mToken;
     private boolean mCancelled;
 
-    public ContactBadgeQueryHandler(ContactBadge badge, String[] excludeMimes) {
-        super(badge.getContext().getContentResolver());
-        mBadge = badge;
+    private ContactQueryHandlerCallback mCallback;
+
+    public ContactQueryHandler(Context context, String[] excludeMimes) {
+        super(context.getContentResolver());
         mExcludeMimes = excludeMimes;
     }
 
-    @Override
     public void startQuery(int token, Object cookie, Uri uri,
                            String[] projection, String selection, String[] selectionArgs,
-                           String orderBy) {
+                           String orderBy, ContactQueryHandlerCallback callback) {
         mToken = token;
+        mCallback = callback;
         super.startQuery(token, cookie, uri, projection, selection, selectionArgs, orderBy);
     }
 
@@ -68,7 +71,8 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
                     trigger = true;
                     createUri = Uri.fromParts("tel", extras.getString(Constants.EXTRA_URI_CONTENT), null);
 
-                    //$FALL-THROUGH$
+                    // $FALL-THROUGH$
+
                 case Constants.TOKEN_PHONE_LOOKUP: {
                     if (cursor != null && cursor.moveToFirst()) {
                         long contactId = cursor.getLong(Constants.PHONE_ID_COLUMN_INDEX);
@@ -78,11 +82,13 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
 
                     break;
                 }
+
                 case Constants.TOKEN_EMAIL_LOOKUP_AND_TRIGGER:
                     trigger = true;
                     createUri = Uri.fromParts("mailto", extras.getString(Constants.EXTRA_URI_CONTENT), null);
 
-                    //$FALL-THROUGH$
+                    // $FALL-THROUGH$
+
                 case Constants.TOKEN_EMAIL_LOOKUP: {
                     if (cursor != null && cursor.moveToFirst()) {
                         long contactId = cursor.getLong(Constants.EMAIL_ID_COLUMN_INDEX);
@@ -94,7 +100,7 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
             }
         }
         catch (Exception e) {
-            Log.w(getClass().getSimpleName(), "Failed to get email data: " + e.getMessage());
+            Log.w(getClass().getSimpleName(), "Failed to get data: " + e.getMessage());
         }
         finally {
             Helper.closeQuietly(cursor);
@@ -102,22 +108,7 @@ public class ContactBadgeQueryHandler extends AsyncQueryHandler {
 
         if (mCancelled) return;
 
-        mBadge.assignContactUri(lookupUri);
-
-        Context context = mBadge.getContext();
-        if (trigger && lookupUri != null) {
-            // Found contact, so trigger QuickContact
-            ContactsContract.QuickContact.showQuickContact(context, mBadge, lookupUri, ContactsContract.QuickContact.MODE_LARGE, mExcludeMimes);
-        }
-        else if (createUri != null) {
-            // Prompt user to add this person to contacts
-            final Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, createUri);
-            if (extras != null) {
-                extras.remove(Constants.EXTRA_URI_CONTENT);
-                intent.putExtras(extras);
-            }
-            context.startActivity(intent);
-        }
+        mCallback.onQueryComplete(token, lookupUri, extras, trigger, createUri);
     }
 
 }

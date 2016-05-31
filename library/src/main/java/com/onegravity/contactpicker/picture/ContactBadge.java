@@ -18,6 +18,7 @@ package com.onegravity.contactpicker.picture;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources.Theme;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,6 +35,7 @@ import android.graphics.drawable.shapes.Shape;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
@@ -67,7 +69,7 @@ public class ContactBadge extends View implements OnClickListener {
     private Uri mContactUri;
     private String mContactEmail;
     private String mContactPhone;
-    private ContactBadgeQueryHandler mQueryHandler;
+    private ContactQueryHandler mQueryHandler;
     private Bundle mExtras = null;
 
     protected String[] mExcludeMimes = null;
@@ -112,7 +114,7 @@ public class ContactBadge extends View implements OnClickListener {
         super(context, attrs, defStyle);
 
         if (!isInEditMode()) {
-            mQueryHandler = new ContactBadgeQueryHandler(this, mExcludeMimes);
+            mQueryHandler = new ContactQueryHandler(context, mExcludeMimes);
         }
         setOnClickListener(this);
 
@@ -405,7 +407,7 @@ public class ContactBadge extends View implements OnClickListener {
         if (!lazyLookup && mQueryHandler != null) {
             mQueryHandler.startQuery(TOKEN_EMAIL_LOOKUP, null,
                     Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
-                    EMAIL_LOOKUP_PROJECTION, null, null, null);
+                    EMAIL_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
         }
         else {
             mContactUri = null;
@@ -445,7 +447,7 @@ public class ContactBadge extends View implements OnClickListener {
         if (!lazyLookup && mQueryHandler != null) {
             mQueryHandler.startQuery(TOKEN_PHONE_LOOKUP, null,
                     Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, mContactPhone),
-                    PHONE_LOOKUP_PROJECTION, null, null, null);
+                    PHONE_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
         } else {
             mContactUri = null;
             onContactUriChanged();
@@ -469,19 +471,42 @@ public class ContactBadge extends View implements OnClickListener {
             extras.putString(Constants.EXTRA_URI_CONTENT, mContactEmail);
             mQueryHandler.startQuery(Constants.TOKEN_EMAIL_LOOKUP_AND_TRIGGER, extras,
                     Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
-                    EMAIL_LOOKUP_PROJECTION, null, null, null);
+                    EMAIL_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
         }
         else if (mContactPhone != null && mQueryHandler != null) {
             extras.putString(Constants.EXTRA_URI_CONTENT, mContactPhone);
             mQueryHandler.startQuery(Constants.TOKEN_PHONE_LOOKUP_AND_TRIGGER, extras,
                     Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, mContactPhone),
-                    PHONE_LOOKUP_PROJECTION, null, null, null);
+                    PHONE_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
         }
         else {
             // If a contact hasn't been assigned, don't react to click.
             return;
         }
     }
+
+    ContactQueryHandler.ContactQueryHandlerCallback mContactQueryHandlerCallback =
+            new ContactQueryHandler.ContactQueryHandlerCallback() {
+                @Override
+                public void onQueryComplete(int token, Uri uri, Bundle extras, boolean trigger, Uri createUri) {
+                    assignContactUri(uri);
+                    if (trigger && uri != null) {
+                        // Found contact, so trigger QuickContact
+                        ContactsContract.QuickContact.showQuickContact(getContext(),
+                                ContactBadge.this, uri, ContactsContract.QuickContact.MODE_LARGE, mExcludeMimes);
+                    }
+                    else if (createUri != null) {
+                        // Prompt user to add this person to contacts
+                        final Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, createUri);
+                        if (extras != null) {
+                            extras.remove(Constants.EXTRA_URI_CONTENT);
+                            intent.putExtras(extras);
+                        }
+                        getContext().startActivity(intent);
+                    }
+
+                }
+            };
 
     /**
      * Set a list of specific MIME-types to exclude and not display. For
