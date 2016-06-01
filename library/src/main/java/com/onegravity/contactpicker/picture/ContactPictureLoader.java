@@ -76,19 +76,21 @@ public class ContactPictureLoader implements Runnable {
             stream = context.getContentResolver().openInputStream(photoUri);
             bitmap = BitmapFactory.decodeStream(stream);
 
-            // some contact pictures aren't square...
-            if (bitmap.getWidth() != bitmap.getHeight()) {
-                int w = bitmap.getWidth();
-                int h = bitmap.getHeight();
-                int indent = Math.abs(w - h) / 2;
-                int x = w > h ? indent : 0;
-                int y = w < h ? indent : 0;
-                int size = Math.min(w, h);
-                bitmap = createBitmap(bitmap, x, y, size, size);
-            }
+            if (bitmap != null) {
+                // some contact pictures aren't square...
+                if (bitmap.getWidth() != bitmap.getHeight()) {
+                    int w = bitmap.getWidth();
+                    int h = bitmap.getHeight();
+                    int indent = Math.abs(w - h) / 2;
+                    int x = w > h ? indent : 0;
+                    int y = w < h ? indent : 0;
+                    int size = Math.min(w, h);
+                    bitmap = createBitmap(bitmap, x, y, size, size);
+                }
 
-            if (roundContactPictures) {
-                bitmap = getRoundedBitmap(bitmap);
+                if (roundContactPictures) {
+                    bitmap = getRoundedBitmap(bitmap);
+                }
             }
         }
         catch (OutOfMemoryError | FileNotFoundException ignore) {}
