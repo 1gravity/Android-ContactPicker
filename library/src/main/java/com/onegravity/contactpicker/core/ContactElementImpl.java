@@ -30,7 +30,7 @@ import java.util.Locale;
 abstract class ContactElementImpl implements ContactElement {
 
 	final private long mId;
-	final private String mDisplayName;
+	private String mDisplayName;
 
 	transient private List<OnContactCheckedListener> mListeners = new ArrayList<>();
 	transient private boolean mChecked = false;
@@ -48,6 +48,10 @@ abstract class ContactElementImpl implements ContactElement {
 	@Override
 	public String getDisplayName() {
 		return mDisplayName != null ? mDisplayName : "";
+	}
+
+	protected void setDisplayName(String value) {
+		mDisplayName = value;
 	}
 
 	@Override
