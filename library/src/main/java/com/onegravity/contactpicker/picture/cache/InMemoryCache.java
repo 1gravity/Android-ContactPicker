@@ -18,6 +18,7 @@ package com.onegravity.contactpicker.picture.cache;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.LruCache;
 
 import java.lang.ref.SoftReference;
@@ -39,7 +40,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
     private final HardLruCache mHardCacheMap;
 
     // Soft object cache for objects removed from the hard cache
-    // this gets cleared by the Garbage Collector everytime we get low on memory
+    // this gets cleared by the Garbage Collector every time we get low on memory
     private ConcurrentHashMap<K, SoftReference<V>> mSoftCache;
 
     // this cache keeps track of misses
@@ -47,6 +48,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
     // (which might be very expensive) or not depending on whether a previous miss has occurred
     private Set<K> mMissCache;
 
+    protected boolean mDebug;
 
     protected class HardLruCache extends LruCache<K, V> {
         public HardLruCache(int initialCapacity) {
@@ -104,6 +106,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
     @Override
     public synchronized void put(K key, V value) {
         if (key != null) {
+            if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".put(" + key + "): " + value);
             mHardCacheMap.put(key, value);
             mMissCache.remove(key);
         }
@@ -125,6 +128,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
         if (key != null) {
             V value = mHardCacheMap.get(key);
             if(value != null) {
+                if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
                 return value;
             }
 
@@ -132,6 +136,7 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
             if(objectRef != null){
                 value = objectRef.get();
                 if(value != null){
+                    if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): hit");
                     return value;
                 }
                 else {
@@ -159,8 +164,10 @@ public abstract class InMemoryCache<K, V> implements Cache<K, V> {
                 return result;
             }
             if (hadMiss) {
+                if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): miss repeatedly");
                 return missedValue;
             }
+            if (mDebug) Log.e("1gravity", getClass().getSimpleName() + ".get(" + key + "): miss");
         }
         return null;
     }

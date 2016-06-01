@@ -72,6 +72,7 @@ public class ContactPictureManager {
             if (photoUri == Uri.EMPTY) {
                 // pseudo uri used as key to retrieve Uris from the cache
                 photoUri = Uri.parse("picture://1gravity.com/"  + Uri.encode(key));
+                ContactUriCache.getInstance().put(key, photoUri);
             }
         }
 
