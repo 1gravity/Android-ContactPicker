@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This is an in-memory implementation of the Cache interface
  */
-abstract class InMemoryCache<K, V> implements Cache<K, V> {
+public abstract class InMemoryCache<K, V> implements Cache<K, V> {
 
     // Both hard and soft caches are purged after n seconds idling.
     private final int mDelayBeforePurge;
