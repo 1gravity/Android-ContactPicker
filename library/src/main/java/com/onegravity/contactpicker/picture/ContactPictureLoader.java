@@ -57,15 +57,13 @@ public class ContactPictureLoader implements Runnable {
         ContactBadge badge = mBadge.get();
         if (badge == null) return; // fail fast
 
-        Bitmap bitmap = retrievePicture(mPhotoUri);
+        Bitmap bitmap = retrievePicture(badge.getContext(), mPhotoUri, mRoundContactPictures);
         if (bitmap != null) {
             ContactPictureLoaded.post(mKey, badge, bitmap);
         }
     }
 
-    private Bitmap retrievePicture(Uri photoUri) {
-        ContactBadge badge = mBadge.get();
-        Context context = badge != null ? badge.getContext() : null;
+    public static Bitmap retrievePicture(Context context, Uri photoUri, boolean roundContactPictures) {
         if (context == null || photoUri == null || Helper.isNullOrEmpty(photoUri.toString())) {
             return null;
         }
@@ -89,7 +87,7 @@ public class ContactPictureLoader implements Runnable {
                 bitmap = createBitmap(bitmap, x, y, size, size);
             }
 
-            if (mRoundContactPictures) {
+            if (roundContactPictures) {
                 bitmap = getRoundedBitmap(bitmap);
             }
         }
@@ -109,7 +107,7 @@ public class ContactPictureLoader implements Runnable {
     /**
      * See http://www.curious-creature.com/2012/12/11/android-recipe-1-image-with-rounded-corners/
      */
-    private Bitmap getRoundedBitmap(Bitmap bitmap) {
+    static private Bitmap getRoundedBitmap(Bitmap bitmap) {
         Bitmap output = createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
         BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);

@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * It can be instantiated and modified only within its own package to prevent modifications from
  * classes outside the package.
  */
-class ContactImpl extends ContactElementImpl implements Contact {
+public class ContactImpl extends ContactElementImpl implements Contact {
 
 	private static final Pattern CONTACT_LETTER = Pattern.compile("[^a-zA-Z]*([a-zA-Z]).*");
 
@@ -90,7 +90,7 @@ class ContactImpl extends ContactElementImpl implements Contact {
 	private char mContactLetterScroll;
 	private Integer mContactColor;
 
-	private ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
+	protected ContactImpl(long id, String lookupKey, String displayName, String firstName, String lastName, Uri photoUri) {
 		super(id, displayName);
 
 		mLookupKey = lookupKey;
@@ -195,24 +195,28 @@ class ContactImpl extends ContactElementImpl implements Contact {
 		return mGroupIds;
 	}
 
-    void setFirstName(String value) {
+	protected void setFirstName(String value) {
 		mFirstName = value;
 	}
 
-    void setLastName(String value) {
+	protected void setLastName(String value) {
 		mLastName = value;
 	}
 
-    void setEmail(int type, String value) {
+	protected void setEmail(int type, String value) {
 		mEmail.put(type, value);
 	}
 
-    void setPhone(int type, String value) {
+	protected void setPhone(int type, String value) {
 		mPhone.put(type, value);
 	}
 
-    void setAddress(int type, String value) {
+	protected void setAddress(int type, String value) {
 		mAddress.put(type, value);
+	}
+
+	protected void setPhotoUri(Uri photoUri) {
+		mPhotoUri = photoUri;
 	}
 
     void addGroupId(long value) {
