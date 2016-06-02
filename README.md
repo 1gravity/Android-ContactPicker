@@ -10,14 +10,70 @@ A demo app can be found here: https://play.google.com/store/apps/details?id=com.
 
 Setup
 -----
+
 ####**Dependencies**
 
 Add this to your Gradle build file:
 ```
 dependencies {
-    compile 'com.1gravity:android-contactpicker:1.0.0'
+    compile 'com.1gravity:android-contactpicker:1.0.3'
 }
 ```
+
+####**Manifest**
+
+The contact picker Activity needs to be defined in the manifest:
+```
+<activity
+    android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
+    android:enabled="true"
+    android:exported="false" >
+
+    <intent-filter>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+    </intent-filter>
+</activity>
+```
+
+####**Usage**
+
+Call the contact picker like this (see JavaDoc for a a description of the individual parameters):
+```
+Intent intent = new Intent(this, ContactPickerActivity.class)
+    .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ? R.style.Theme_Dark : R.style.Theme_Light)
+    .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE, ContactPictureType.ROUND.name())
+    .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION, ContactDescription.ADDRESS.name())
+    .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+    .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER, ContactSortOrder.AUTOMATIC.name());
+startActivityForResult(intent, REQUEST_CONTACT);
+```
+
+Process the result like this:
+```
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == REQUEST_CONTACT && resultCode == Activity.RESULT_OK &&
+        data != null && data.hasExtra(ContactPickerActivity.RESULT_CONTACT_DATA)) {
+        
+        // we got a result from the contact picker
+        List<Contact> contacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
+
+        for (Contact contact : contacts) {
+            // process the contacts...
+        }
+    }
+}
+```
+
+The source code includes a more comprehensive example, also check out the demo app on Google Play: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
+
+####**Theming**
+
+The library supports a dark and a light theme out-of-the-box. For that it defines a couple of custom
+attributes (attrs.xml). To integrate the contact picker in your app, you need to either extend one
+of the contact picker themes (ContactPicker_Theme_Light or ContactPicker_Theme_Dark) or define the
+custom attributes in your own theme.
 
 #### **Proguard**
 
@@ -36,11 +92,6 @@ If you use Proguard in your app, please add the following lines to your configur
     public void set*(...);
 }
 ```
-
-####**Theming**
-
-TBW
-Use one of the AppCompat themes (Theme.AppCompat, Theme.AppCompat.Light or one of its derivatives).
 
 Issues
 ------
