@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-The Android Contact Picker is a beautifully designed component to pick one or several contacts (including groups) from the Android contacts list.
+The Android Contact Picker is a beautifully designed component to pick one or several contacts (including groups) from the Android contacts list.<br>
 A demo app can be found here: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
 ![Contact picker light theme](art/contact_list_light_framed_small.png?raw=true "Contact picker light theme")
@@ -22,7 +22,7 @@ dependencies {
 
 ####**Manifest**
 
-The contact picker Activity needs to be defined in the manifest:
+Define the contact picker Activity in the manifest:
 ```
 <activity
     android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
@@ -38,7 +38,7 @@ The contact picker Activity needs to be defined in the manifest:
 
 ####**Usage**
 
-Call the contact picker like this (see JavaDoc for a a description of the individual parameters):
+Call the contact picker like this (see Javadoc for a description of the individual parameters):
 ```
 Intent intent = new Intent(this, ContactPickerActivity.class)
     .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ? R.style.Theme_Dark : R.style.Theme_Light)
@@ -66,18 +66,19 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
-The source code includes a more comprehensive example, also check out the demo app on Google Play: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
+The source code includes a more comprehensive example.<br>Also check out the demo app on Google Play: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
 ####**Theming**
 
-The library supports a dark and a light theme out-of-the-box. For that it defines a couple of custom
-attributes (attrs.xml). To integrate the contact picker in your app, you need to either extend one
-of the contact picker themes (ContactPicker_Theme_Light or ContactPicker_Theme_Dark) or define the
-custom attributes in your own theme.
+The library supports a dark and a light theme out-of-the-box. In order to do that, it defines a
+couple of custom attributes in attrs.xml.
+To integrate the contact picker in your app, you need to either extend one of the contact picker
+themes (ContactPicker_Theme_Light / ContactPicker_Theme_Dark) or define the custom attributes in
+your own theme.
 
 #### **Proguard**
 
-If you use Proguard in your app, please add the following lines to your configuration file:
+If you use Proguard, please add the following lines to your configuration file:
 ```
 -keepattributes *Annotation*
 -keepclassmembers class ** {
@@ -96,7 +97,7 @@ If you use Proguard in your app, please add the following lines to your configur
 Issues
 ------
 
-If you have an issues with this library, please open a issue here: https://github.com/1gravity/Android-ColorPicker/issues and provide enough information to reproduce it reliably. The following information needs to be provided:
+If you have an issues with this library, please open a issue here: https://github.com/1gravity/Android-ContactPicker/issues and provide enough information to reproduce it reliably. The following information needs to be provided:
 
 * Which version of the SDK are you using?
 * Which Android build are you using? (e.g. MPZ44Q)
