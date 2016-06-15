@@ -28,6 +28,6 @@ import java.util.Collection;
  */
 public interface Group extends ContactElement {
 
-	Collection<Contact> getContacts();
+    Collection<Contact> getContacts();
 
 }

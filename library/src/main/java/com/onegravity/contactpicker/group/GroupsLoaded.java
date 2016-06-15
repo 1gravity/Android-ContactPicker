@@ -28,19 +28,19 @@ import java.util.List;
  */
 public class GroupsLoaded {
 
-	public static void post(List<? extends Group> groups) {
-		GroupsLoaded event = new GroupsLoaded(groups);
-		EventBus.getDefault().postSticky( event );
-	}
+    public static void post(List<? extends Group> groups) {
+        GroupsLoaded event = new GroupsLoaded(groups);
+        EventBus.getDefault().postSticky(event);
+    }
 
-	final private List<? extends Group> mGroups;
+    final private List<? extends Group> mGroups;
 
-	private GroupsLoaded(List<? extends Group> groups) {
-		mGroups = groups;
-	}
+    private GroupsLoaded(List<? extends Group> groups) {
+        mGroups = groups;
+    }
 
-	public List<? extends Group> getGroups() {
-		return mGroups;
-	}
+    public List<? extends Group> getGroups() {
+        return mGroups;
+    }
 
 }

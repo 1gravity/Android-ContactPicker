@@ -29,15 +29,15 @@ import java.util.Set;
  */
 public interface Contact extends ContactElement {
 
-	String getFirstName();
+    String getFirstName();
 
-	String getLastName();
+    String getLastName();
 
-	String getEmail(int type);
+    String getEmail(int type);
 
-	String getPhone(int type);
+    String getPhone(int type);
 
-	String getAddress(int type);
+    String getAddress(int type);
 
     /**
      * The contact letter is used in the ContactBadge (if no contact picture can be found).
@@ -51,17 +51,17 @@ public interface Contact extends ContactElement {
     char getContactLetter(ContactSortOrder sortOrder);
 
     /**
-	 * The contact color is used in the ContactBadge (if no contact picture can be found) as
-	 * background color.
-	 */
-	int getContactColor();
+     * The contact color is used in the ContactBadge (if no contact picture can be found) as
+     * background color.
+     */
+    int getContactColor();
 
-	/**
-	 * Unique key across all contacts that won't change even if the column id changes.
-	 */
-	String getLookupKey();
+    /**
+     * Unique key across all contacts that won't change even if the column id changes.
+     */
+    String getLookupKey();
 
-	Uri getPhotoUri();
+    Uri getPhotoUri();
 
     Set<Long> getGroupIds();
 }

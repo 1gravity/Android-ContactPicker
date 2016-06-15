@@ -59,7 +59,7 @@ import static com.onegravity.contactpicker.picture.Constants.TOKEN_PHONE_LOOKUP;
 /**
  * The ContactBadge.
  *
- * Derivied from {@link android.widget.QuickContactBadge}.
+ * Derived from {@link android.widget.QuickContactBadge}.
  */
 public class ContactBadge extends View implements OnClickListener {
     /**
@@ -137,8 +137,7 @@ public class ContactBadge extends View implements OnClickListener {
 
         if (roundContactPictures) {
             initRound(context);
-        }
-        else {
+        } else {
             initSquare(context);
         }
     }
@@ -234,21 +233,20 @@ public class ContactBadge extends View implements OnClickListener {
     }
 
     public void setCharacter(Character c, int color) {
-    	mChar = Character.toString(c);
-    	mDrawable = null;
-    	if (mRoundContactPictures) {
-        	mBackground.setColor(color);
-    	}
-    	else {
-        	setBackgroundColor(color);
-    	}
+        mChar = Character.toString(c);
+        mDrawable = null;
+        if (mRoundContactPictures) {
+            mBackground.setColor(color);
+        } else {
+            setBackgroundColor(color);
+        }
         invalidate();
     }
-    
+
     public void setBitmap(Bitmap bitmap) {
-    	mChar = null;
-    	if (mDrawable == null || mDrawable.getBitmap() != bitmap) {
-        	mDrawable = new BitmapDrawable(getContext().getResources(), bitmap);
+        mChar = null;
+        if (mDrawable == null || mDrawable.getBitmap() != bitmap) {
+            mDrawable = new BitmapDrawable(getContext().getResources(), bitmap);
             mKey = null;
             invalidate();
         }
@@ -259,7 +257,7 @@ public class ContactBadge extends View implements OnClickListener {
     @Override
     protected void drawableStateChanged() {
         super.drawableStateChanged();
-        
+
         boolean isPressed = false;
         for (int state : getDrawableState()) {
             if (state == android.R.attr.state_pressed || state == android.R.attr.state_focused) {
@@ -267,9 +265,9 @@ public class ContactBadge extends View implements OnClickListener {
                 break;
             }
         }
-        
+
         if (isPressed != mIsPressed) {
-        	mIsPressed = isPressed;
+            mIsPressed = isPressed;
             invalidate();
         }
     }
@@ -278,63 +276,60 @@ public class ContactBadge extends View implements OnClickListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-    	int w = getWidth();
-    	int h = getHeight();
+        int w = getWidth();
+        int h = getHeight();
 
-    	if (mRoundContactPictures) {
-        	onDrawCircle(canvas, w, h);
-    	}
-    	else {
-    		onDrawSquare(canvas, w, h);
-    	}
+        if (mRoundContactPictures) {
+            onDrawCircle(canvas, w, h);
+        } else {
+            onDrawSquare(canvas, w, h);
+        }
 
         if (mIsPressed) {
-        	mPressedOverlay.setBounds(0, 0, w, h);
-        	mPressedOverlay.draw(canvas);
+            mPressedOverlay.setBounds(0, 0, w, h);
+            mPressedOverlay.draw(canvas);
         }
     }
 
     private void onDrawCircle(Canvas canvas, int w, int h) {
-    	if (mDrawable != null) {
-        	// picture
-        	mDrawable.setBounds(0, 0, w, h);
-        	mDrawable.draw(canvas);
-        }
-        else if (! TextUtils.isEmpty(mChar)) {
-        	// circle
-        	float radius = Math.min(w, h) / 2f;
-        	canvas.drawCircle(radius, radius, radius, mBackground);
+        if (mDrawable != null) {
+            // picture
+            mDrawable.setBounds(0, 0, w, h);
+            mDrawable.draw(canvas);
+        } else if (!TextUtils.isEmpty(mChar)) {
+            // circle
+            float radius = Math.min(w, h) / 2f;
+            canvas.drawCircle(radius, radius, radius, mBackground);
 
-        	// letter
-	    	mTextPaint.getTextBounds(mChar, 0, 1, mRect);
-	    	float width = mTextPaint.measureText(mChar);
-	    	canvas.drawText(mChar, (mSizeInPx - width)/2f, (mSizeInPx + mRect.height()) / 2f, mTextPaint);
+            // letter
+            mTextPaint.getTextBounds(mChar, 0, 1, mRect);
+            float width = mTextPaint.measureText(mChar);
+            canvas.drawText(mChar, (mSizeInPx - width) / 2f, (mSizeInPx + mRect.height()) / 2f, mTextPaint);
         }
     }
 
     private void onDrawSquare(Canvas canvas, int w, int h) {
         if (mDrawable != null) {
-        	// picture
-        	mDrawable.setBounds(0, 0, w, h);
-        	mDrawable.draw(canvas);
-        }
-        else if (! TextUtils.isEmpty(mChar)) {
-        	// letter
-	    	mTextPaint.getTextBounds(mChar, 0, 1, mRect);
-	    	float width = mTextPaint.measureText(mChar);
-	    	canvas.drawText(mChar, (mSizeInPx - width)/2f, (mSizeInPx + mRect.height()) / 2f, mTextPaint);
+            // picture
+            mDrawable.setBounds(0, 0, w, h);
+            mDrawable.draw(canvas);
+        } else if (!TextUtils.isEmpty(mChar)) {
+            // letter
+            mTextPaint.getTextBounds(mChar, 0, 1, mRect);
+            float width = mTextPaint.measureText(mChar);
+            canvas.drawText(mChar, (mSizeInPx - width) / 2f, (mSizeInPx + mRect.height()) / 2f, mTextPaint);
         }
 
         // chip / triangle
         if (isEnabled() && mTriangle != null) {
             // triangle
-        	int size = Math.round(mSizeInPx/3f - mOffset/2f);
-        	mTriangle.setBounds(w - size, h - size, w, h);
-        	mTriangle.draw(canvas);
+            int size = Math.round(mSizeInPx / 3f - mOffset / 2f);
+            mTriangle.setBounds(w - size, h - size, w, h);
+            mTriangle.draw(canvas);
 
-        	// line
-        	size = Math.round(mSizeInPx/3f);
-        	canvas.drawLine(w - size - mOffset, h + mOffset, w + mOffset, h - size - mOffset, mLinePaint);
+            // line
+            size = Math.round(mSizeInPx / 3f);
+            canvas.drawLine(w - size - mOffset, h + mOffset, w + mOffset, h - size - mOffset, mLinePaint);
         }
     }
 
@@ -381,8 +376,8 @@ public class ContactBadge extends View implements OnClickListener {
      * performed to lookup the URI based on the email.
      *
      * @param emailAddress The email address of the contact.
-     * @param lazyLookup If this is true, the lookup query will not be performed
-     * until this view is clicked.
+     * @param lazyLookup   If this is true, the lookup query will not be performed
+     *                     until this view is clicked.
      */
     public void assignContactFromEmail(String emailAddress, boolean lazyLookup) {
         assignContactFromEmail(emailAddress, lazyLookup, null);
@@ -394,12 +389,12 @@ public class ContactBadge extends View implements OnClickListener {
      * performed to lookup the URI based on the email.
      *
      * @param emailAddress The email address of the contact.
-     * @param lazyLookup If this is true, the lookup query will not be performed until this view is
-     *                   clicked.
-     * @param extras A bundle of extras to populate the contact edit page with if the contact is not
-     *               found and the user chooses to add the email address to an existing contact or
-     *               create a new contact. Uses the same string constants as those found in
-     *               {@link android.provider.ContactsContract.Intents.Insert}
+     * @param lazyLookup   If this is true, the lookup query will not be performed until this view is
+     *                     clicked.
+     * @param extras       A bundle of extras to populate the contact edit page with if the contact is not
+     *                     found and the user chooses to add the email address to an existing contact or
+     *                     create a new contact. Uses the same string constants as those found in
+     *                     {@link android.provider.ContactsContract.Intents.Insert}
      */
     public void assignContactFromEmail(String emailAddress, boolean lazyLookup, Bundle extras) {
         mContactEmail = emailAddress;
@@ -408,8 +403,7 @@ public class ContactBadge extends View implements OnClickListener {
             mQueryHandler.startQuery(TOKEN_EMAIL_LOOKUP, null,
                     Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
                     EMAIL_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
-        }
-        else {
+        } else {
             mContactUri = null;
             onContactUriChanged();
         }
@@ -421,8 +415,8 @@ public class ContactBadge extends View implements OnClickListener {
      * phone number.
      *
      * @param phoneNumber The phone number of the contact.
-     * @param lazyLookup If this is true, the lookup query will not be performed  until this view is
-     *                   clicked.
+     * @param lazyLookup  If this is true, the lookup query will not be performed  until this view is
+     *                    clicked.
      */
     public void assignContactFromPhone(String phoneNumber, boolean lazyLookup) {
         assignContactFromPhone(phoneNumber, lazyLookup, new Bundle());
@@ -434,12 +428,12 @@ public class ContactBadge extends View implements OnClickListener {
      * phone number.
      *
      * @param phoneNumber The phone number of the contact.
-     * @param lazyLookup If this is true, the lookup query will not be performed  until this view is
-     *                   clicked.
-     * @param extras A bundle of extras to populate the contact edit page with if the contact is not
-     *               found and the user chooses to add the phone number to an existing contact or
-     *               create a new contact. Uses the same string constants as those found in
-     *               {@link android.provider.ContactsContract.Intents.Insert}
+     * @param lazyLookup  If this is true, the lookup query will not be performed  until this view is
+     *                    clicked.
+     * @param extras      A bundle of extras to populate the contact edit page with if the contact is not
+     *                    found and the user chooses to add the phone number to an existing contact or
+     *                    create a new contact. Uses the same string constants as those found in
+     *                    {@link android.provider.ContactsContract.Intents.Insert}
      */
     public void assignContactFromPhone(String phoneNumber, boolean lazyLookup, Bundle extras) {
         mContactPhone = phoneNumber;
@@ -466,20 +460,17 @@ public class ContactBadge extends View implements OnClickListener {
         final Bundle extras = (mExtras == null) ? new Bundle() : mExtras;
         if (mContactUri != null) {
             QuickContact.showQuickContact(getContext(), ContactBadge.this, mContactUri, QuickContact.MODE_LARGE, mExcludeMimes);
-        }
-        else if (mContactEmail != null && mQueryHandler != null) {
+        } else if (mContactEmail != null && mQueryHandler != null) {
             extras.putString(Constants.EXTRA_URI_CONTENT, mContactEmail);
             mQueryHandler.startQuery(Constants.TOKEN_EMAIL_LOOKUP_AND_TRIGGER, extras,
                     Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
                     EMAIL_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
-        }
-        else if (mContactPhone != null && mQueryHandler != null) {
+        } else if (mContactPhone != null && mQueryHandler != null) {
             extras.putString(Constants.EXTRA_URI_CONTENT, mContactPhone);
             mQueryHandler.startQuery(Constants.TOKEN_PHONE_LOOKUP_AND_TRIGGER, extras,
                     Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, mContactPhone),
                     PHONE_LOOKUP_PROJECTION, null, null, null, mContactQueryHandlerCallback);
-        }
-        else {
+        } else {
             // If a contact hasn't been assigned, don't react to click.
             return;
         }
@@ -494,8 +485,7 @@ public class ContactBadge extends View implements OnClickListener {
                         // Found contact, so trigger QuickContact
                         ContactsContract.QuickContact.showQuickContact(getContext(),
                                 ContactBadge.this, uri, ContactsContract.QuickContact.MODE_LARGE, mExcludeMimes);
-                    }
-                    else if (createUri != null) {
+                    } else if (createUri != null) {
                         // Prompt user to add this person to contacts
                         final Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, createUri);
                         if (extras != null) {

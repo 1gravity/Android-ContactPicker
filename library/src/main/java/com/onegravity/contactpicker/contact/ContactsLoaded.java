@@ -28,19 +28,19 @@ import java.util.List;
  */
 public class ContactsLoaded {
 
-	public static void post(List<? extends Contact> contacts) {
-		ContactsLoaded event = new ContactsLoaded(contacts);
-		EventBus.getDefault().postSticky( event );
-	}
+    public static void post(List<? extends Contact> contacts) {
+        ContactsLoaded event = new ContactsLoaded(contacts);
+        EventBus.getDefault().postSticky(event);
+    }
 
-	final private List<? extends Contact> mContacts;
+    final private List<? extends Contact> mContacts;
 
-	private ContactsLoaded(List<? extends Contact> contacts) {
-		mContacts = contacts;
-	}
+    private ContactsLoaded(List<? extends Contact> contacts) {
+        mContacts = contacts;
+    }
 
-	public List<? extends Contact> getContacts() {
-		return mContacts;
-	}
+    public List<? extends Contact> getContacts() {
+        return mContacts;
+    }
 
 }

@@ -27,7 +27,7 @@ public class ContactUriCache extends InMemoryCache<String, Uri> {
 
     // we need to synchronize this to make sure there's no race condition instantiating the cache
     public synchronized static ContactUriCache getInstance() {
-        if (sInstance==null) {
+        if (sInstance == null) {
             sInstance = new ContactUriCache();
         }
         return sInstance;
@@ -35,10 +35,11 @@ public class ContactUriCache extends InMemoryCache<String, Uri> {
 
     /**
      * Get a photo Uri from the cache.
+     *
      * @return Null if the Uri is not in the cache.
-     * 		   Uri.Empty if it's not in the cache with a previous miss meaning we already tried to
-     * 		   retrieve the query before and we failed, so there's really no point trying again
-     * 		   A valid Uri that can be used to retrieve the image.
+     * Uri.Empty if it's not in the cache with a previous miss meaning we already tried to
+     * retrieve the query before and we failed, so there's really no point trying again
+     * A valid Uri that can be used to retrieve the image.
      */
     public static Uri getUriFromCache(String key) {
         return getInstance().get(key, Uri.EMPTY);

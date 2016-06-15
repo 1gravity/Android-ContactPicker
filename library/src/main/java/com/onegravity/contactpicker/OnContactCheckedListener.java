@@ -18,6 +18,6 @@ package com.onegravity.contactpicker;
 
 public interface OnContactCheckedListener<E extends ContactElement> {
 
-	void onContactChecked(E contact, boolean wasChecked, boolean isChecked);
+    void onContactChecked(E contact, boolean wasChecked, boolean isChecked);
 
 }
