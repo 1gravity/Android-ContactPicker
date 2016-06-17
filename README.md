@@ -16,7 +16,7 @@ Setup
 Add this to your Gradle build file:
 ```
 dependencies {
-    compile 'com.1gravity:android-contactpicker:1.0.5'
+    compile 'com.1gravity:android-contactpicker:1.0.6'
 }
 ```
 
