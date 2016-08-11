@@ -21,18 +21,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.BulletSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.onegravity.contactpicker.ContactElement;
 import com.onegravity.contactpicker.contact.Contact;
 import com.onegravity.contactpicker.contact.ContactDescription;
 import com.onegravity.contactpicker.contact.ContactSortOrder;
 import com.onegravity.contactpicker.core.ContactPickerActivity;
+import com.onegravity.contactpicker.group.Group;
 import com.onegravity.contactpicker.picture.ContactPictureType;
 
 import java.io.Serializable;
@@ -41,12 +41,14 @@ import java.util.List;
 public class DemoActivity extends BaseActivity {
 
     private static final String EXTRA_DARK_THEME = "EXTRA_DARK_THEME";
+    private static final String EXTRA_GROUPS = "EXTRA_GROUPS";
     private static final String EXTRA_CONTACTS = "EXTRA_CONTACTS";
 
     private static final int REQUEST_CONTACT = 0;
 
     private boolean mDarkTheme;
     private List<Contact> mContacts;
+    private List<Group> mGroups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +56,14 @@ public class DemoActivity extends BaseActivity {
 
         // read parameters either from the Intent or from the Bundle
         if (savedInstanceState != null) {
-            mDarkTheme = savedInstanceState.getBoolean("mDarkTheme");
-            mContacts = (List<Contact>) savedInstanceState.getSerializable("mContacts");
+            mDarkTheme = savedInstanceState.getBoolean(EXTRA_DARK_THEME);
+            mGroups = (List<Group>) savedInstanceState.getSerializable(EXTRA_GROUPS);
+            mContacts = (List<Contact>) savedInstanceState.getSerializable(EXTRA_CONTACTS);
         }
         else {
             Intent intent = getIntent();
             mDarkTheme = intent.getBooleanExtra(EXTRA_DARK_THEME, false);
+            mGroups = (List<Group>) intent.getSerializableExtra(EXTRA_GROUPS);
             mContacts = (List<Contact>) intent.getSerializableExtra(EXTRA_CONTACTS);
         }
 
@@ -99,43 +103,55 @@ public class DemoActivity extends BaseActivity {
         }
 
         // populate contact list
-        populateContactList(mContacts);
+        populateContactList(mGroups, mContacts);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean("mDarkTheme", mDarkTheme);
+        outState.putBoolean(EXTRA_DARK_THEME, mDarkTheme);
+        if (mGroups != null) {
+            outState.putSerializable(EXTRA_GROUPS, (Serializable) mGroups);
+        }
         if (mContacts != null) {
-            outState.putSerializable("mContacts", (Serializable) mContacts);
+            outState.putSerializable(EXTRA_CONTACTS, (Serializable) mContacts);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CONTACT && resultCode == Activity.RESULT_OK &&
-            data != null && data.hasExtra(ContactPickerActivity.RESULT_CONTACT_DATA)) {
+        if (requestCode == REQUEST_CONTACT && resultCode == Activity.RESULT_OK && data != null &&
+                (data.hasExtra(ContactPickerActivity.RESULT_GROUP_DATA) ||
+                 data.hasExtra(ContactPickerActivity.RESULT_CONTACT_DATA))) {
 
             // we got a result from the contact picker --> show the picked contacts
+            mGroups = (List<Group>) data.getSerializableExtra(ContactPickerActivity.RESULT_GROUP_DATA);
             mContacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
-            populateContactList(mContacts);
+            populateContactList(mGroups, mContacts);
         }
     }
 
-    private void populateContactList(List<Contact> contacts) {
-        if (contacts == null || mContacts.isEmpty()) return;
-
+    private void populateContactList(List<Group> groups, List<Contact> contacts) {
         // we got a result from the contact picker --> show the picked contacts
         TextView contactsView = (TextView) findViewById(R.id.contacts);
         SpannableStringBuilder result = new SpannableStringBuilder();
+
         try {
-            int pos = 0;
-            for (Contact contact : contacts) {
-                String displayName = contact.getDisplayName();
-                result.append(displayName + "\n");
-                result.setSpan(new BulletSpan(15), pos, pos + displayName.length() + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                pos += displayName.length() + 1;
+            if (groups != null && ! groups.isEmpty()) {
+                result.append("GROUPS\n");
+                for (Group group : groups) {
+                    populateContact(result, group, "");
+                    for (Contact contact : group.getContacts()) {
+                        populateContact(result, contact, "    ");
+                    }
+                }
+            }
+            if (contacts != null && ! contacts.isEmpty()) {
+                result.append("CONTACTS\n");
+                for (ContactElement contact : contacts) {
+                    populateContact(result, contact, "");
+                }
             }
         }
         catch (Exception e) {
@@ -143,6 +159,14 @@ public class DemoActivity extends BaseActivity {
         }
 
         contactsView.setText(result);
+    }
+
+    private void populateContact(SpannableStringBuilder result, ContactElement element, String prefix) {
+        //int start = result.length();
+        String displayName = element.getDisplayName();
+        result.append(prefix);
+        result.append(displayName + "\n");
+        //result.setSpan(new BulletSpan(15), start, result.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
     }
 
     @Override
@@ -168,6 +192,9 @@ public class DemoActivity extends BaseActivity {
             mDarkTheme = ! mDarkTheme;
             Intent intent = new Intent(this, this.getClass())
                     .putExtra(EXTRA_DARK_THEME, mDarkTheme);
+            if (mGroups != null) {
+                intent.putExtra(EXTRA_GROUPS, (Serializable) mGroups);
+            }
             if (mContacts != null) {
                 intent.putExtra(EXTRA_CONTACTS, (Serializable) mContacts);
             }

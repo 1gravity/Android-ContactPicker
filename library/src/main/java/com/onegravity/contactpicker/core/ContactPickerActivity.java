@@ -137,6 +137,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
      */
     public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
 
+    /**
+     * We put the resulting group list into the Intent as extra data with this key.
+     */
+    public static final String RESULT_GROUP_DATA = "RESULT_GROUP_DATA";
+
     private int mThemeResId;
 
     private ContactPictureType mBadgeType = ContactPictureType.ROUND;
@@ -354,8 +359,19 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
         }
 
+        // return only checked groups
+        List<Group> groups = new ArrayList<>();
+        if (mGroups != null) {
+            for (Group group : mGroups) {
+                if (group.isChecked()) {
+                    groups.add(group);
+                }
+            }
+        }
+
         Intent data = new Intent();
         data.putExtra(RESULT_CONTACT_DATA, (Serializable) contacts);
+        data.putExtra(RESULT_GROUP_DATA, (Serializable) groups);
         setResult(Activity.RESULT_OK, data);
         finish();
     }
