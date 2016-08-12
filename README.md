@@ -57,10 +57,17 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         data != null && data.hasExtra(ContactPickerActivity.RESULT_CONTACT_DATA)) {
         
         // we got a result from the contact picker
-        List<Contact> contacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
 
+        // process contacts
+        List<Contact> contacts = (List<Contact>) data.getSerializableExtra(ContactPickerActivity.RESULT_CONTACT_DATA);
         for (Contact contact : contacts) {
             // process the contacts...
+        }
+
+        // process groups
+        List<Group> groups = (List<Group>) data.getSerializableExtra(ContactPickerActivity.RESULT_GROUP_DATA);
+        for (Group group : groups) {
+            // process the groups...
         }
     }
 }
