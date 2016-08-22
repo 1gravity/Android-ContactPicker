@@ -22,8 +22,10 @@ dependencies {
 
 ####**Manifest**
 
-Define the contact picker Activity in the manifest:
+Define the contact picker Activity and the READ_CONTACTS permission in the manifest:
 ```
+<uses-permission android:name="android.permission.READ_CONTACTS" />
+
 <activity
     android:name="com.onegravity.contactpicker.core.ContactPickerActivity"
     android:enabled="true"
@@ -36,6 +38,9 @@ Define the contact picker Activity in the manifest:
 </activity>
 ```
 
+Please note that if your app targets Android 6 and higher (API level 23 and abobe) you also need to request the contacts permission at run-time.
+Check out the demo app for an example how it can be done.
+ 
 ####**Usage**
 
 Call the contact picker like this (see Javadoc for a description of the individual parameters):
