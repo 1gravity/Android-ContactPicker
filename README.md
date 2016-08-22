@@ -38,8 +38,8 @@ Define the contact picker Activity and the READ_CONTACTS permission in the manif
 </activity>
 ```
 
-Please note that if your app targets Android 6 and higher (API level 23 and abobe) you also need to request the contacts permission at run-time.
-Check out the demo app for an example how it can be done.
+Note: if your app targets Android 6 and higher (API level 23 and above), you also need to request the contacts permission at run-time.
+Check out the demo app for an example how this can be done.
  
 ####**Usage**
 
