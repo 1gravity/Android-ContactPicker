@@ -83,7 +83,7 @@ public class ContactImpl extends ContactElementImpl implements Contact {
     private Map<Integer, String> mEmail = new HashMap<>();
     private Map<Integer, String> mPhone = new HashMap<>();
     private Map<Integer, String> mAddress = new HashMap<>();
-    transient private Uri mPhotoUri;
+    private String mPhotoUri;
     private Set<Long> mGroupIds = new HashSet<>();
 
     private char mContactLetterBadge;
@@ -96,7 +96,7 @@ public class ContactImpl extends ContactElementImpl implements Contact {
         mLookupKey = lookupKey;
         mFirstName = Helper.isNullOrEmpty(firstName) ? "---" : firstName;
         mLastName = Helper.isNullOrEmpty(lastName) ? "---" : lastName;
-        mPhotoUri = photoUri;
+        setPhotoUri(photoUri);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class ContactImpl extends ContactElementImpl implements Contact {
 
     @Override
     public Uri getPhotoUri() {
-        return mPhotoUri;
+        return mPhotoUri != null ? Uri.parse(mPhotoUri) : null;
     }
 
     @Override
@@ -216,7 +216,7 @@ public class ContactImpl extends ContactElementImpl implements Contact {
     }
 
     protected void setPhotoUri(Uri photoUri) {
-        mPhotoUri = photoUri;
+        mPhotoUri = photoUri != null ? photoUri.toString() : null;
     }
 
     void addGroupId(long value) {

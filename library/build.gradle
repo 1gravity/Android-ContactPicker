@@ -18,7 +18,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 14
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    def supportLibVersion = '24.1.1'
+    def supportLibVersion = '24.2.0'
     def eventBusLibVersion = '3.0.0'
     def fastScrollVersion = '0.1.3'
 

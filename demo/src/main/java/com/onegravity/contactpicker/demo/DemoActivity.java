@@ -149,7 +149,7 @@ public class DemoActivity extends BaseActivity {
             }
             if (contacts != null && ! contacts.isEmpty()) {
                 result.append("CONTACTS\n");
-                for (ContactElement contact : contacts) {
+                for (Contact contact : contacts) {
                     populateContact(result, contact, "");
                 }
             }
