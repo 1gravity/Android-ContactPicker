@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    def supportLibVersion = '24.2.0'
+    def supportLibVersion = '24.2.1'
     def eventBusLibVersion = '3.0.0'
     def fastScrollVersion = '0.1.3'
 
