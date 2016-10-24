@@ -89,6 +89,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
 
     /**
+     * This parameter sets the boolean which decides whether to show the check all menu button.
+     * By default, this is true
+     */
+    public static final String EXTRA_SHOW_CHECK_ALL = "EXTRA_SHOW_CHECK_ALL";
+
+    /**
      * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
      * parameter and uses the android.provider.ContactsContract.CommonDataKinds values
      *
@@ -154,6 +160,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private PagerAdapter mAdapter;
 
     private String mDefaultTitle;
+
+    private Boolean mShowCheckAll = true;
 
     // update the adapter after a certain amount of contacts has loaded
     private static final int BATCH_SIZE = 50;
@@ -223,6 +231,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
          */
         String enumName = intent.getStringExtra(EXTRA_CONTACT_BADGE_TYPE);
         mBadgeType = ContactPictureType.lookup(enumName);
+
+        /*
+         * Retrieve ShowCheckAll.
+         */
+        mShowCheckAll = intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
 
         /*
          * Retrieve ContactDescription.
@@ -329,6 +342,10 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.cp_contact_picker, menu);
+        if(!mShowCheckAll){
+            MenuItem checkAllBtn = menu.findItem(R.id.action_check_all);
+            checkAllBtn.setVisible(mShowCheckAll);
+        }
         return true;
     }
 
