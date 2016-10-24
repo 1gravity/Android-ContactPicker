@@ -81,6 +81,18 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 The source code includes a more comprehensive example.<br>Also check out the demo app on Google Play: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
+####**Intent Extra Parameters**
+
+As seen above in the example, these parameters are chained to the intent where each param descriptor is attached to `ContactPickerActivity`. 
+Below is a listing of the parameters and their purpose:
+
+| Parameter  | Description  |
+|---|:---|
+|  **EXTRA_SELECT_CONTACTS_LIMIT** (int)  |  This parameter will limit the amount of contacts that can be selected per intent. When set to zero, then no limiting will be enforced <br/> Default: `0` |
+|  **EXTRA_LIMIT_REACHED_MESSAGE** (String)  |  This parameter sets the text displayed as a toast when the set limit is reached <br/> Default: `You have reached the limit!` |
+|  **EXTRA_SHOW_CHECK_ALL** (Boolean)  |  This parameter decides whether to show/hide the check_all button in the menu. When `EXTRA_SELECT_CONTACTS_LIMIT` > 0, this will be forced to `false`.  <br/> Default: `true` |
+|  **EXTRA_ONLY_CONTACTS_WITH_PHONE** (Boolean)  |  This parameter sets the boolean that filters contacts that have no phone numbers <br/> Default: `false` |
+
 ####**Theming**
 
 The library supports a dark and a light theme out-of-the-box. In order to do that, it defines a

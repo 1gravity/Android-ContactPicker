@@ -34,6 +34,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
@@ -89,10 +90,27 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_CONTACT_DESCRIPTION = "EXTRA_CONTACT_DESCRIPTION";
 
     /**
+     * This parameter sets limit of the amount of contacts the user can select on each intent.
+     * By default, the retrieved value is 0
+     */
+    public static final String EXTRA_SELECT_CONTACTS_LIMIT = "EXTRA_SELECT_CONTACTS_LIMIT";
+
+    /**
+     * This parameter sets messages seen in a toast when the selection limit has been reached.
+     */
+    public static final String EXTRA_LIMIT_REACHED_MESSAGE = "EXTRA_LIMIT_REACHED_MESSAGE";
+
+    /**
      * This parameter sets the boolean which decides whether to show the check all menu button.
-     * By default, this is true
+     * By default, the retrieved value is true
      */
     public static final String EXTRA_SHOW_CHECK_ALL = "EXTRA_SHOW_CHECK_ALL";
+
+    /**
+     * This parameter sets a boolean to filter out contacts that do not have phone numbers.
+     * By default, the retrieved value is false
+     */
+    public static final String EXTRA_ONLY_CONTACTS_WITH_PHONE = "EXTRA_ONLY_CONTACTS_WITH_PHONE";
 
     /**
      * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
@@ -175,12 +193,18 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
     private static final String GROUP_IDS = "GROUP_IDS";
     private HashSet<Long> mSelectedGroupIds = new HashSet<>();
+    private Activity mActivity;
+
+    private String mLimitReachedMessage = "You have reached the limit!";
+    private int mSelectContactsLimit = 0;
+    private Boolean mOnlyWithPhoneNumbers = false;
 
     // ****************************************** Lifecycle Methods *******************************************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivity = this;
 
         /*
          * Check if we have the READ_CONTACTS permission, if not --> terminate.
@@ -233,9 +257,27 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mBadgeType = ContactPictureType.lookup(enumName);
 
         /*
+         * Retrieve SelectContactsLimit.
+         */
+        mSelectContactsLimit = intent.getIntExtra(EXTRA_SELECT_CONTACTS_LIMIT, 0);
+
+        /*
          * Retrieve ShowCheckAll.
          */
-        mShowCheckAll = intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
+        mShowCheckAll = (mSelectContactsLimit > 0) ? false : intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
+
+        /*
+         * Retrieve OnlyWithPhoneNumbers.
+         */
+        mOnlyWithPhoneNumbers = intent.getBooleanExtra(EXTRA_ONLY_CONTACTS_WITH_PHONE, false);
+
+        /*
+         * Retrieve LimitReachedMessage.
+         */
+        String limitMsg = intent.getStringExtra(EXTRA_LIMIT_REACHED_MESSAGE);
+        if(limitMsg != null){
+            mLimitReachedMessage = limitMsg;
+        }
 
         /*
          * Retrieve ContactDescription.
@@ -269,7 +311,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
         mAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
-                                    mSortOrder, mBadgeType, mDescription, mDescriptionType);
+                mSortOrder, mBadgeType, mDescription, mDescriptionType);
         viewPager.setAdapter(mAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
@@ -440,11 +482,17 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String selection = "";
+        if(mOnlyWithPhoneNumbers){
+            selection = ContactsContract.Contacts.HAS_PHONE_NUMBER;
+        }
         switch(id) {
             case CONTACTS_LOADER_ID:
-                return new CursorLoader(this, CONTACTS_URI, CONTACTS_PROJECTION, null, null, CONTACTS_SORT);
+                return new CursorLoader(this, CONTACTS_URI, CONTACTS_PROJECTION,
+                        selection, null, CONTACTS_SORT);
             case CONTACT_DETAILS_LOADER_ID:
-                return new CursorLoader(this, CONTACT_DETAILS_URI, CONTACT_DETAILS_PROJECTION, null, null, null);
+                return new CursorLoader(this, CONTACT_DETAILS_URI, CONTACT_DETAILS_PROJECTION,
+                        selection, null, null);
             case GROUPS_LOADER_ID:
                 return new CursorLoader(this, GROUPS_URI, GROUPS_PROJECTION, GROUPS_SELECTION, null, GROUPS_SORT);
         }
@@ -692,7 +740,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            if (wasChecked != isChecked) {
+            if(!wasChecked && isChecked && mSelectContactsLimit > 0 && mNrOfSelectedContacts+1 > mSelectContactsLimit ){
+                contact.setChecked(false, true);
+                ContactsLoaded.post(mContacts);
+                Toast.makeText(mActivity, mLimitReachedMessage,
+                        Toast.LENGTH_LONG).show();
+
+            }else if (wasChecked != isChecked) {
                 mNrOfSelectedContacts += isChecked ? 1 : -1;
                 mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
                 updateTitle();
@@ -710,11 +764,21 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            // check/un-check the group's contacts
-            processContactSelection(group, isChecked);
+            if(!wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                    mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit ){
+                group.setChecked(false, true);
+                GroupsLoaded.post(mVisibleGroups);
+                Toast.makeText(mActivity, mLimitReachedMessage,
+                        Toast.LENGTH_LONG).show();
 
-            // check if we need to deselect some groups
-            processGroupSelection();
+            }else{
+                // check/un-check the group's contacts
+                processContactSelection(group, isChecked);
+                // check if we need to deselect some groups
+                processGroupSelection();
+            }
+
+
         }
     };
 
