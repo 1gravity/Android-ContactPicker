@@ -342,8 +342,10 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.cp_contact_picker, menu);
-        MenuItem item = menu.findItem(R.id.action_check_all);
-        item.setVisible(mShowCheckAll);
+        if(!mShowCheckAll){
+            MenuItem checkAllBtn = menu.findItem(R.id.action_check_all);
+            checkAllBtn.setVisible(mShowCheckAll);
+        }
         return true;
     }
 
