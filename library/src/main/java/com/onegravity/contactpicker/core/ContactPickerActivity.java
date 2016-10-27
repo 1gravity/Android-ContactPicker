@@ -193,7 +193,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
     private static final String GROUP_IDS = "GROUP_IDS";
     private HashSet<Long> mSelectedGroupIds = new HashSet<>();
-    private Activity mActivity;
 
     private String mLimitReachedMessage;
     private int mSelectContactsLimit = 0;
@@ -204,7 +203,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivity = this;
 
         /*
          * Check if we have the READ_CONTACTS permission, if not --> terminate.
@@ -264,7 +262,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
         /*
          * Retrieve ShowCheckAll.
          */
-        mShowCheckAll = (mSelectContactsLimit > 0) ? false : intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
+        mShowCheckAll = mSelectContactsLimit > 0 ? false :
+                intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
 
         /*
          * Retrieve OnlyWithPhoneNumbers.
@@ -743,13 +742,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            if(!wasChecked && isChecked && mSelectContactsLimit > 0 && mNrOfSelectedContacts+1 > mSelectContactsLimit ){
+            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                    mNrOfSelectedContacts+1 > mSelectContactsLimit ){
                 contact.setChecked(false, true);
                 ContactsLoaded.post(mContacts);
-                Toast.makeText(mActivity, mLimitReachedMessage,
+                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
                         Toast.LENGTH_LONG).show();
-
-            }else if (wasChecked != isChecked) {
+            } else if (wasChecked != isChecked) {
                 mNrOfSelectedContacts += isChecked ? 1 : -1;
                 mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
                 updateTitle();
@@ -767,14 +766,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            if(!wasChecked && isChecked && mSelectContactsLimit > 0 &&
+            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
                     mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit ){
                 group.setChecked(false, true);
                 GroupsLoaded.post(mVisibleGroups);
-                Toast.makeText(mActivity, mLimitReachedMessage,
+                Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
                         Toast.LENGTH_LONG).show();
-
-            }else{
+            } else {
                 // check/un-check the group's contacts
                 processContactSelection(group, isChecked);
                 // check if we need to deselect some groups
