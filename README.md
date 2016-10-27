@@ -89,7 +89,7 @@ Below is a listing of the parameters and their purpose:
 | Parameter  | Description  |
 |---|:---|
 |  **EXTRA_SELECT_CONTACTS_LIMIT** (int)  |  This parameter will limit the amount of contacts that can be selected per intent. When set to zero, then no limiting will be enforced <br/> Default: `0` |
-|  **EXTRA_LIMIT_REACHED_MESSAGE** (String)  |  This parameter sets the text displayed as a toast when the set limit is reached <br/> Default: `You have reached the limit!` |
+|  **EXTRA_LIMIT_REACHED_MESSAGE** (String)  |  This parameter sets the text displayed as a toast when the set limit is reached <br/> Default: `You can't pick more than {limit} contacts!` |
 |  **EXTRA_SHOW_CHECK_ALL** (Boolean)  |  This parameter decides whether to show/hide the check_all button in the menu. When `EXTRA_SELECT_CONTACTS_LIMIT` > 0, this will be forced to `false`.  <br/> Default: `true` |
 |  **EXTRA_ONLY_CONTACTS_WITH_PHONE** (Boolean)  |  This parameter sets the boolean that filters contacts that have no phone numbers <br/> Default: `false` |
 
