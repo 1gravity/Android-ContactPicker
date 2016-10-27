@@ -195,7 +195,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private HashSet<Long> mSelectedGroupIds = new HashSet<>();
     private Activity mActivity;
 
-    private String mLimitReachedMessage = "You have reached the limit!";
+    private String mLimitReachedMessage;
     private int mSelectContactsLimit = 0;
     private Boolean mOnlyWithPhoneNumbers = false;
 
@@ -277,6 +277,9 @@ public class ContactPickerActivity extends AppCompatActivity implements
         String limitMsg = intent.getStringExtra(EXTRA_LIMIT_REACHED_MESSAGE);
         if(limitMsg != null){
             mLimitReachedMessage = limitMsg;
+        }
+        else {
+            mLimitReachedMessage = getString(R.string.cp_limit_reached, mSelectContactsLimit);
         }
 
         /*
