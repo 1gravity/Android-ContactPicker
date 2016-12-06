@@ -53,6 +53,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -157,6 +158,22 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_CONTACT_SORT_ORDER = "EXTRA_CONTACT_SORT_ORDER";
 
     /**
+     * This parameter contains a serializable collection of contact IDs. The contacts matching these IDs are
+     * preselected when entering the activity.
+     *
+     * {@link com.onegravity.contactpicker.ContactElement}
+     */
+    public static final String EXTRA_PRESELECTED_CONTACTS = "EXTRA_PRESELECTED_CONTACTS";
+
+    /**
+     * This parameter contains a serializable collection of group IDs. The groups matching these IDs are
+     * preselected when entering the activity.
+     *
+     * {@link com.onegravity.contactpicker.ContactElement}
+     */
+    public static final String EXTRA_PRESELECTED_GROUPS = "EXTRA_PRESELECTED_GROUPS";
+
+    /**
      * We put the resulting contact list into the Intent as extra data with this key.
      */
     public static final String RESULT_CONTACT_DATA = "RESULT_CONTACT_DATA";
@@ -231,6 +248,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
             }
             catch (PackageManager.NameNotFoundException ignore) {
                 mDefaultTitle = getTitle().toString();
+            }
+
+            if(intent.hasExtra(EXTRA_PRESELECTED_CONTACTS)) {
+                Collection<Long> preselectedContacts = (Collection<Long>) intent.getSerializableExtra( EXTRA_PRESELECTED_CONTACTS );
+                mSelectedContactIds.addAll(preselectedContacts);
+            }
+
+            if(intent.hasExtra(EXTRA_PRESELECTED_GROUPS)) {
+                Collection<Long> preselectedGroups = (Collection<Long>) intent.getSerializableExtra( EXTRA_PRESELECTED_GROUPS );
+                mSelectedGroupIds.addAll(preselectedGroups);
             }
 
             mThemeResId = intent.getIntExtra(EXTRA_THEME, R.style.ContactPicker_Theme_Light);
