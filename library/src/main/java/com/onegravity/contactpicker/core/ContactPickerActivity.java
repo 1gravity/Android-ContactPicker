@@ -158,16 +158,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_CONTACT_SORT_ORDER = "EXTRA_CONTACT_SORT_ORDER";
 
     /**
-     * This parameter contains a serializable collection of contact IDs. The contacts matching these IDs are
-     * preselected when entering the activity.
+     * This parameter contains a serializable collection of contact IDs.
+     * The contacts matching these IDs are preselected when entering the activity.
      *
      * {@link com.onegravity.contactpicker.ContactElement}
      */
     public static final String EXTRA_PRESELECTED_CONTACTS = "EXTRA_PRESELECTED_CONTACTS";
 
     /**
-     * This parameter contains a serializable collection of group IDs. The groups matching these IDs are
-     * preselected when entering the activity.
+     * This parameter contains a serializable collection of group IDs.
+     * The groups matching these IDs are preselected when entering the activity.
      *
      * {@link com.onegravity.contactpicker.ContactElement}
      */
