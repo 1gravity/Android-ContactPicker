@@ -26,10 +26,10 @@
         <item name="cp_badgeTriangleColor">@color/contact_badge_triangle_light</item>
         <item name="cp_badgeOverlayColor">@color/contact_badge_overlay_light</item>
 
-        <item name="cp_actionIconOK">@drawable/ic_check_black_36dp</item>
-        <item name="cp_actionIconCancel">@drawable/ic_close_black_36dp</item>
-        <item name="cp_actionIconCheckAll">@drawable/ic_apps_black_36dp</item>
-        <item name="cp_actionIconSearch">@drawable/ic_search_black_36dp</item>
+        <item name="cp_actionIconOK">@drawable/ic_done_black_24dp</item>
+        <item name="cp_actionIconCancel">@drawable/ic_close_black_24dp</item>
+        <item name="cp_actionIconCheckAll">@drawable/ic_apps_black_24dp</item>
+        <item name="cp_actionIconSearch">@drawable/ic_search_black_24dp</item>
     </style>
 
     <!-- DARK Theme -->
@@ -41,10 +41,10 @@
         <item name="cp_badgeTriangleColor">@color/contact_badge_triangle_dark</item>
         <item name="cp_badgeOverlayColor">@color/contact_badge_overlay_dark</item>
 
-        <item name="cp_actionIconOK">@drawable/ic_check_white_36dp</item>
-        <item name="cp_actionIconCancel">@drawable/ic_close_white_36dp</item>
-        <item name="cp_actionIconCheckAll">@drawable/ic_apps_white_36dp</item>
-        <item name="cp_actionIconSearch">@drawable/ic_search_white_36dp</item>
+        <item name="cp_actionIconOK">@drawable/ic_done_white_24dp</item>
+        <item name="cp_actionIconCancel">@drawable/ic_close_white_24dp</item>
+        <item name="cp_actionIconCheckAll">@drawable/ic_apps_white_24dp</item>
+        <item name="cp_actionIconSearch">@drawable/ic_search_white_24dp</item>
     </style>
 
 </resources>
