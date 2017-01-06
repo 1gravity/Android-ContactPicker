@@ -60,7 +60,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> impl
     public void setData(List<? extends Contact> contacts) {
         mContacts = contacts;
         notifyDataSetChanged();
-        calculateSections();
+        if(mContacts.size()>0)
+            calculateSections();
     }
 
     @Override
