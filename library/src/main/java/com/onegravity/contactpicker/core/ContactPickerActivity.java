@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -220,6 +223,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // check if all custom attributes are defined
+        if (! checkTheming()) {
+            finish();
+            return;
+        }
 
         /*
          * Check if we have the READ_CONTACTS permission, if not --> terminate.
@@ -896,6 +905,55 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
 
         return false;
+    }
+
+    // ****************************************** Misc Method *******************************************
+
+    private static boolean sThemingChecked;
+
+    /**
+     * This method makes sure that all mandatory style attributes are defined for the current theme.
+     */
+    private boolean checkTheming() {
+        if (sThemingChecked) {
+            return true;
+        }
+
+        Resources.Theme theme = getTheme();
+        Resources res = getResources();
+        TypedValue typedValue = new TypedValue();
+
+        int[] resIds =  getStyleableAttributes("ContactPicker");
+        for (int resId : resIds) {
+            String resName = res.getResourceEntryName(resId);
+            boolean exists = theme.resolveAttribute(resId, typedValue, true);
+            if (! exists) {
+                themeFailure(resName);
+                return false;
+            }
+        }
+
+        sThemingChecked = true;
+        return true;
+    }
+
+    private int[] getStyleableAttributes(String name ) {
+        Field[] allFields = R.styleable.class.getDeclaredFields();
+        for (Field field : allFields) {
+            if (name.equals(field.getName())) {
+                try {
+                    return (int[]) field.get(R.styleable.class);
+                } catch (IllegalAccessException ignore) {}
+            }
+        }
+
+        return null;
+    }
+
+    private void themeFailure(String resName) {
+        Toast.makeText(this, "Attribute undefined: \"" + resName + "\". " +
+                "Did you apply the correct theme?", Toast.LENGTH_LONG).show();
+        finish();
     }
 
 }

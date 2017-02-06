@@ -17,7 +17,7 @@
 
 <resources>
 
-    <declare-styleable name="Theme">
+    <declare-styleable name="ContactPicker">
         <attr name="cp_textColorPrimary" format="color|reference"/>
         <attr name="cp_textColorSecondary" format="color|reference"/>
 

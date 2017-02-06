@@ -50,9 +50,9 @@ android {
 }
 
 dependencies {
-    // use this to compile/run locally
-    compile project(':library')
+    // debug builds should take the local code
+    debugCompile project(':library')
 
-    // or this to use the latest published library
-    //compile "com.1gravity:android-contactpicker:1.2.0"
+    // release builds should take the published artifact
+    releaseCompile "com.1gravity:android-contactpicker:1.2.1"
 }
