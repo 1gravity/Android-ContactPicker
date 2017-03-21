@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2015-2016 Emanuel Moecklin
+  Copyright (C) 2015-2017 Emanuel Moecklin
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
 
     <item
         android:id="@+id/action_done"
-        app:showAsAction="always"
+        app:showAsAction="always|withText"
         android:icon="?attr/cp_actionIconOK"
         android:title="@android:string/ok"/>
 
