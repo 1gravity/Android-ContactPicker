@@ -224,12 +224,6 @@ public class ContactPickerActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // check if all custom attributes are defined
-        if (! checkTheming()) {
-            finish();
-            return;
-        }
-
         /*
          * Check if we have the READ_CONTACTS permission, if not --> terminate.
          */
@@ -331,6 +325,13 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mSortOrder = ContactSortOrder.lookup(enumName);
 
         setTheme(mThemeResId);
+
+        // check if all custom attributes are defined
+        if (! checkTheming()) {
+            finish();
+            return;
+        }
+
         setContentView(R.layout.cp_contact_tab_layout);
 
         // initialize TabLayout
