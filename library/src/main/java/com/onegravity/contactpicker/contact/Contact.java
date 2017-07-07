@@ -20,6 +20,7 @@ import android.net.Uri;
 
 import com.onegravity.contactpicker.ContactElement;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,11 +34,63 @@ public interface Contact extends ContactElement {
 
     String getLastName();
 
+    /**
+     * ContactsContract.CommonDataKinds.Email.TYPE values:
+     *
+     * - TYPE_CUSTOM
+     * - TYPE_HOME
+     * - TYPE_WORK
+     * - TYPE_OTHER
+     * - TYPE_MOBILE
+     *
+     * @param type the type
+     * @return a String with the Email.
+     */
     String getEmail(int type);
 
+    /**
+     * @see com.onegravity.contactpicker.contact.Contact#getEmail(int)
+     * @return the map type to email.
+     */
+    Map<Integer, String> getMapEmail();
+
+    /**
+     * ContactsContract.CommonDataKinds.Email.ContactsContract.CommonDataKinds.Phone.TYPE values:
+     *
+     * - TYPE_CUSTOM, TYPE_HOME, TYPE_MOBILE, TYPE_WORK, TYPE_FAX_WORK, TYPE_FAX_HOME, TYPE_PAGER
+     * - TYPE_OTHER, TYPE_CALLBACK, TYPE_CAR, TYPE_COMPANY_MAIN, TYPE_ISDN, TYPE_MAIN
+     * - TYPE_OTHER_FAX, TYPE_RADIO, TYPE_TELEX, TYPE_TTY_TDD, TYPE_WORK_MOBILE, TYPE_WORK_PAGER
+     * - TYPE_ASSISTANT, TYPE_MMS
+     *
+     * @param type the type
+     * @return a String with the phone.
+     */
     String getPhone(int type);
 
+    /**
+     * @see com.onegravity.contactpicker.contact.Contact#getPhone(int)
+     * @return the map type to phone.
+     */
+    Map<Integer, String> getMapPhone();
+
+    /**
+     * * ContactsContract.CommonDataKinds.StructuredPostal.TYPE values:
+     *
+     * - TYPE_CUSTOM
+     * - TYPE_HOME
+     * - TYPE_WORK
+     * - TYPE_OTHER
+     *
+     * @param type the type
+     * @return A String with the address
+     */
     String getAddress(int type);
+
+    /**
+     * @see com.onegravity.contactpicker.contact.Contact#getAddress(int)
+     * @return the map type to address.
+     */
+    Map<Integer, String> getMapAddress();
 
     /**
      * The contact letter is used in the ContactBadge (if no contact picture can be found).

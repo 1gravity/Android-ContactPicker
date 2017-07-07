@@ -292,8 +292,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         /*
          * Retrieve ShowCheckAll.
          */
-        mShowCheckAll = mSelectContactsLimit > 0 ? false :
-                intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
+        mShowCheckAll = mSelectContactsLimit <= 0 && intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
 
         /*
          * Retrieve OnlyWithPhoneNumbers.
