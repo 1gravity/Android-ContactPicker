@@ -390,7 +390,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         outState.putInt("mThemeResId", mThemeResId);
 
-        mSelectedContactIds.clear();;
+        mSelectedContactIds.clear();
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
                 mSelectedContactIds.add( contact.getId() );
@@ -398,7 +398,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
         outState.putSerializable(CONTACT_IDS, mSelectedContactIds);
 
-        mSelectedGroupIds.clear();;
+        mSelectedGroupIds.clear();
         for (Group group : mGroups) {
             if (group.isChecked()) {
                 mSelectedGroupIds.add( group.getId() );
@@ -778,18 +778,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts+1 > mSelectContactsLimit ){
+            if (isAboveContactLimit(1, wasChecked, isChecked)){
                 contact.setChecked(false, true);
                 ContactsLoaded.post(mContacts);
                 Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
                         Toast.LENGTH_LONG).show();
-            } else if (wasChecked != isChecked) {
-                mNrOfSelectedContacts += isChecked ? 1 : -1;
-                mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
-                updateTitle();
+            } else {
+                updateSelectedIds(mSelectedContactIds, contact.getId(), isChecked);
+                calculateNumberContactsSelected();
 
-                if (! isChecked) {
+                if (!isChecked) {
                     processGroupSelection();
                 }
             }
@@ -802,8 +800,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit ){
+            if (isAboveContactLimit(group.getContacts().size(), wasChecked, isChecked)){
                 group.setChecked(false, true);
                 GroupsLoaded.post(mVisibleGroups);
                 Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
@@ -819,10 +816,15 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
     };
 
+    private boolean isAboveContactLimit(int contactsSelection, boolean wasChecked, boolean isChecked) {
+        return !wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                mNrOfSelectedContacts + contactsSelection > mSelectContactsLimit;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactSelectionChanged event) {
         // all has changed -> calculate the number of selected contacts and update the title
-        calcNrOfSelectedContacts();
+        calculateNumberContactsSelected();
 
         // check if we need to deselect some groups
         processGroupSelection();
@@ -845,8 +847,17 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
 
         if (hasChanged) {
+            updateSelectedIds(mSelectedGroupIds, group.getId(), isChecked);
             ContactsLoaded.post(mContacts);
-            calcNrOfSelectedContacts();
+            calculateNumberContactsSelected();
+        }
+    }
+
+    private void updateSelectedIds(HashSet<Long> selectIds, long contactId, boolean isChecked) {
+        if (isChecked) {
+            selectIds.add(contactId);
+        } else {
+            selectIds.remove(contactId);
         }
     }
 
@@ -854,7 +865,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
      * Calculate the number or selected contacts.
      * Call this when a group has been selected/deselected or after a ContactSelectionChanged event.
      */
-    private void calcNrOfSelectedContacts() {
+    private void calculateNumberContactsSelected() {
         if (mContacts == null) return;
 
         mNrOfSelectedContacts = 0;
@@ -924,12 +935,14 @@ public class ContactPickerActivity extends AppCompatActivity implements
         TypedValue typedValue = new TypedValue();
 
         int[] resIds =  getStyleableAttributes("ContactPicker");
-        for (int resId : resIds) {
-            String resName = res.getResourceEntryName(resId);
-            boolean exists = theme.resolveAttribute(resId, typedValue, true);
-            if (! exists) {
-                themeFailure(resName);
-                return false;
+        if (resIds != null) {
+            for (int resId : resIds) {
+                String resName = res.getResourceEntryName(resId);
+                boolean exists = theme.resolveAttribute(resId, typedValue, true);
+                if (! exists) {
+                    themeFailure(resName);
+                    return false;
+                }
             }
         }
 
@@ -937,7 +950,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         return true;
     }
 
-    private int[] getStyleableAttributes(String name ) {
+    private int[] getStyleableAttributes(String name) {
         Field[] allFields = R.styleable.class.getDeclaredFields();
         for (Field field : allFields) {
             if (name.equals(field.getName())) {
