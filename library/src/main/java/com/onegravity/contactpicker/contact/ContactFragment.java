@@ -137,6 +137,7 @@ public class ContactFragment extends BaseFragment {
         for (Contact contact : mFilteredContacts) {
             if (contact.isChecked() != isChecked) {
                 contact.setChecked(isChecked, true);
+
             }
         }
 

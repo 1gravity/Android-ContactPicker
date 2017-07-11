@@ -117,6 +117,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_ONLY_CONTACTS_WITH_PHONE = "EXTRA_ONLY_CONTACTS_WITH_PHONE";
 
     /**
+     * This parameter sets a boolean to only show tab contacts or both (contacts and group).
+     * By default, the retrieved value is true
+     */
+    public static final String EXTRA_WITH_GROUP_TAB = "EXTRA_WITH_GROUP_TAB";
+
+    /**
      * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
      * parameter and uses the android.provider.ContactsContract.CommonDataKinds values
      *
@@ -217,6 +223,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private String mLimitReachedMessage;
     private int mSelectContactsLimit = 0;
     private Boolean mOnlyWithPhoneNumbers = false;
+    private Boolean mWithGroupTab = true;
 
     // ****************************************** Lifecycle Methods *******************************************
 
@@ -300,6 +307,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         mOnlyWithPhoneNumbers = intent.getBooleanExtra(EXTRA_ONLY_CONTACTS_WITH_PHONE, false);
 
         /*
+         * Retrieve mWithGroupTab.
+         */
+        mWithGroupTab = intent.getBooleanExtra(EXTRA_WITH_GROUP_TAB, true);
+
+        /*
          * Retrieve LimitReachedMessage.
          */
         String limitMsg = intent.getStringExtra(EXTRA_LIMIT_REACHED_MESSAGE);
@@ -342,9 +354,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         tabContacts.setText(R.string.cp_contact_tab_title);
         tabLayout.addTab(tabContacts);
 
-        TabLayout.Tab tabGroups = tabLayout.newTab();
-        tabGroups.setText(R.string.cp_group_tab_title);
-        tabLayout.addTab(tabGroups);
+        if (mWithGroupTab) {
+            TabLayout.Tab tabGroups = tabLayout.newTab();
+            tabGroups.setText(R.string.cp_group_tab_title);
+            tabLayout.addTab(tabGroups);
+        }
 
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
@@ -784,8 +798,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
                 Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
                         Toast.LENGTH_LONG).show();
             } else {
-                updateSelectedIds(mSelectedContactIds, contact.getId(), isChecked);
-                calculateNumberContactsSelected();
+                updateSelectContacts();
 
                 if (!isChecked) {
                     processGroupSelection();
@@ -824,7 +837,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactSelectionChanged event) {
         // all has changed -> calculate the number of selected contacts and update the title
-        calculateNumberContactsSelected();
+        updateSelectContacts();
 
         // check if we need to deselect some groups
         processGroupSelection();
@@ -837,6 +850,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private void processContactSelection(Group group, boolean isChecked) {
         if (group == null || mContacts == null) return;
 
+        updateSelectedGroupIds(mSelectedGroupIds, group.getId(), isChecked);
+
         // check/un-check contacts
         boolean hasChanged = false;
         for (Contact contact : group.getContacts()) {
@@ -847,13 +862,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
 
         if (hasChanged) {
-            updateSelectedIds(mSelectedGroupIds, group.getId(), isChecked);
+            updateSelectContacts();
             ContactsLoaded.post(mContacts);
-            calculateNumberContactsSelected();
         }
     }
 
-    private void updateSelectedIds(HashSet<Long> selectIds, long contactId, boolean isChecked) {
+    private void updateSelectedGroupIds(HashSet<Long> selectIds, long contactId, boolean isChecked) {
         if (isChecked) {
             selectIds.add(contactId);
         } else {
@@ -865,13 +879,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
      * Calculate the number or selected contacts.
      * Call this when a group has been selected/deselected or after a ContactSelectionChanged event.
      */
-    private void calculateNumberContactsSelected() {
+    private void updateSelectContacts() {
         if (mContacts == null) return;
 
         mNrOfSelectedContacts = 0;
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
                 mNrOfSelectedContacts++;
+                mSelectedContactIds.add(contact.getId());
+            } else {
+                mSelectedContactIds.remove(contact.getId());
             }
         }
 
