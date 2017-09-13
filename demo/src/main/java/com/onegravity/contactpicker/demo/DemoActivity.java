@@ -90,6 +90,7 @@ public class DemoActivity extends BaseActivity {
                             .putExtra(ContactPickerActivity.EXTRA_SHOW_CHECK_ALL, true)
                             .putExtra(ContactPickerActivity.EXTRA_SELECT_CONTACTS_LIMIT, 0)
                             .putExtra(ContactPickerActivity.EXTRA_ONLY_CONTACTS_WITH_PHONE, false)
+                            .putExtra(ContactPickerActivity.EXTRA_WITH_GROUP_TAB, false)
 
                             .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,
                                       ContactsContract.CommonDataKinds.Email.TYPE_WORK)

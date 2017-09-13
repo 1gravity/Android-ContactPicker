@@ -113,27 +113,42 @@ public class ContactImpl extends ContactElementImpl implements Contact {
     public String getEmail(int type) {
         String email = mEmail.get(type);
         if (email == null && !mEmail.isEmpty()) {
-            email = mEmail.values().iterator().next();
+            email = "";
         }
         return email;
+    }
+
+    @Override
+    public Map<Integer, String> getMapEmail() {
+        return mEmail;
     }
 
     @Override
     public String getPhone(int type) {
         String phone = mPhone.get(type);
         if (phone == null && !mPhone.isEmpty()) {
-            phone = mPhone.values().iterator().next();
+            phone = "";
         }
         return phone;
+    }
+
+    @Override
+    public Map<Integer, String> getMapPhone() {
+        return mPhone;
     }
 
     @Override
     public String getAddress(int type) {
         String address = mAddress.get(type);
         if (address == null && !mAddress.isEmpty()) {
-            address = mAddress.values().iterator().next();
+            address = "";
         }
         return address;
+    }
+
+    @Override
+    public Map<Integer, String> getMapAddress() {
+        return mAddress;
     }
 
     @Override

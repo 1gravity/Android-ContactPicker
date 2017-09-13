@@ -38,6 +38,11 @@ import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScrol
 
 public class ContactFragment extends BaseFragment {
 
+    private static final String REQUEST_SORT_ORDER = "sortOrder";
+    private static final String REQUEST_PICTURE_TYPE = "pictureType";
+    private static final String REQUEST_CONTACT_DESCRIPTION = "contactDescription";
+    private static final String REQUEST_DESCRIPTION_TYPE = "descriptionType";
+
     private ContactSortOrder mSortOrder;
     private ContactPictureType mPictureType;
     private ContactDescription mDescription;
@@ -62,10 +67,10 @@ public class ContactFragment extends BaseFragment {
                                               ContactDescription contactDescription,
                                               int descriptionType) {
         Bundle args = new Bundle();
-        args.putString("sortOrder", sortOrder.name());
-        args.putString("pictureType", pictureType.name());
-        args.putString("contactDescription", contactDescription.name());
-        args.putInt("descriptionType", descriptionType);
+        args.putString(REQUEST_SORT_ORDER, sortOrder.name());
+        args.putString(REQUEST_PICTURE_TYPE, pictureType.name());
+        args.putString(REQUEST_CONTACT_DESCRIPTION, contactDescription.name());
+        args.putInt(REQUEST_DESCRIPTION_TYPE, descriptionType);
         ContactFragment fragment = new ContactFragment();
         fragment.setArguments(args);
         return fragment;
@@ -78,10 +83,10 @@ public class ContactFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mSortOrder = ContactSortOrder.lookup( args.getString("sortOrder") );
-        mPictureType = ContactPictureType.lookup( args.getString("pictureType") );
-        mDescription = ContactDescription.lookup( args.getString("contactDescription") );
-        mDescriptionType = args.getInt("descriptionType");
+        mSortOrder = ContactSortOrder.lookup( args.getString(REQUEST_SORT_ORDER) );
+        mPictureType = ContactPictureType.lookup( args.getString(REQUEST_PICTURE_TYPE) );
+        mDescription = ContactDescription.lookup( args.getString(REQUEST_CONTACT_DESCRIPTION) );
+        mDescriptionType = args.getInt(REQUEST_DESCRIPTION_TYPE);
     }
 
     @Override
@@ -132,6 +137,7 @@ public class ContactFragment extends BaseFragment {
         for (Contact contact : mFilteredContacts) {
             if (contact.isChecked() != isChecked) {
                 contact.setChecked(isChecked, true);
+
             }
         }
 

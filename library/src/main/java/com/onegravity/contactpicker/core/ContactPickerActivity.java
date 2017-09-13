@@ -117,6 +117,12 @@ public class ContactPickerActivity extends AppCompatActivity implements
     public static final String EXTRA_ONLY_CONTACTS_WITH_PHONE = "EXTRA_ONLY_CONTACTS_WITH_PHONE";
 
     /**
+     * This parameter sets a boolean to only show tab contacts or both (contacts and group).
+     * By default, the retrieved value is true
+     */
+    public static final String EXTRA_WITH_GROUP_TAB = "EXTRA_WITH_GROUP_TAB";
+
+    /**
      * This defines which type is shown in the description. It refines the EXTRA_CONTACT_DESCRIPTION
      * parameter and uses the android.provider.ContactsContract.CommonDataKinds values
      *
@@ -217,6 +223,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private String mLimitReachedMessage;
     private int mSelectContactsLimit = 0;
     private Boolean mOnlyWithPhoneNumbers = false;
+    private Boolean mWithGroupTab = true;
 
     // ****************************************** Lifecycle Methods *******************************************
 
@@ -292,13 +299,17 @@ public class ContactPickerActivity extends AppCompatActivity implements
         /*
          * Retrieve ShowCheckAll.
          */
-        mShowCheckAll = mSelectContactsLimit > 0 ? false :
-                intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
+        mShowCheckAll = mSelectContactsLimit <= 0 && intent.getBooleanExtra(EXTRA_SHOW_CHECK_ALL, true);
 
         /*
          * Retrieve OnlyWithPhoneNumbers.
          */
         mOnlyWithPhoneNumbers = intent.getBooleanExtra(EXTRA_ONLY_CONTACTS_WITH_PHONE, false);
+
+        /*
+         * Retrieve mWithGroupTab.
+         */
+        mWithGroupTab = intent.getBooleanExtra(EXTRA_WITH_GROUP_TAB, true);
 
         /*
          * Retrieve LimitReachedMessage.
@@ -343,9 +354,11 @@ public class ContactPickerActivity extends AppCompatActivity implements
         tabContacts.setText(R.string.cp_contact_tab_title);
         tabLayout.addTab(tabContacts);
 
-        TabLayout.Tab tabGroups = tabLayout.newTab();
-        tabGroups.setText(R.string.cp_group_tab_title);
-        tabLayout.addTab(tabGroups);
+        if (mWithGroupTab) {
+            TabLayout.Tab tabGroups = tabLayout.newTab();
+            tabGroups.setText(R.string.cp_group_tab_title);
+            tabLayout.addTab(tabGroups);
+        }
 
         // initialize ViewPager
         final ViewPager viewPager = (ViewPager) findViewById(R.id.tabPager);
@@ -391,7 +404,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
 
         outState.putInt("mThemeResId", mThemeResId);
 
-        mSelectedContactIds.clear();;
+        mSelectedContactIds.clear();
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
                 mSelectedContactIds.add( contact.getId() );
@@ -399,7 +412,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
         outState.putSerializable(CONTACT_IDS, mSelectedContactIds);
 
-        mSelectedGroupIds.clear();;
+        mSelectedGroupIds.clear();
         for (Group group : mGroups) {
             if (group.isChecked()) {
                 mSelectedGroupIds.add( group.getId() );
@@ -779,18 +792,15 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Contact> mContactListener = new OnContactCheckedListener<Contact>() {
         @Override
         public void onContactChecked(Contact contact, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts+1 > mSelectContactsLimit ){
+            if (isAboveContactLimit(1, wasChecked, isChecked)){
                 contact.setChecked(false, true);
                 ContactsLoaded.post(mContacts);
                 Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
                         Toast.LENGTH_LONG).show();
-            } else if (wasChecked != isChecked) {
-                mNrOfSelectedContacts += isChecked ? 1 : -1;
-                mNrOfSelectedContacts = Math.min(mContacts.size(), Math.max(0, mNrOfSelectedContacts));
-                updateTitle();
+            } else {
+                updateSelectContacts();
 
-                if (! isChecked) {
+                if (!isChecked) {
                     processGroupSelection();
                 }
             }
@@ -803,8 +813,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private OnContactCheckedListener<Group> mGroupListener = new OnContactCheckedListener<Group>() {
         @Override
         public void onContactChecked(Group group, boolean wasChecked, boolean isChecked) {
-            if (!wasChecked && isChecked && mSelectContactsLimit > 0 &&
-                    mNrOfSelectedContacts + group.getContacts().size() > mSelectContactsLimit ){
+            if (isAboveContactLimit(group.getContacts().size(), wasChecked, isChecked)){
                 group.setChecked(false, true);
                 GroupsLoaded.post(mVisibleGroups);
                 Toast.makeText(ContactPickerActivity.this, mLimitReachedMessage,
@@ -820,10 +829,15 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
     };
 
+    private boolean isAboveContactLimit(int contactsSelection, boolean wasChecked, boolean isChecked) {
+        return !wasChecked && isChecked && mSelectContactsLimit > 0 &&
+                mNrOfSelectedContacts + contactsSelection > mSelectContactsLimit;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactSelectionChanged event) {
         // all has changed -> calculate the number of selected contacts and update the title
-        calcNrOfSelectedContacts();
+        updateSelectContacts();
 
         // check if we need to deselect some groups
         processGroupSelection();
@@ -836,6 +850,8 @@ public class ContactPickerActivity extends AppCompatActivity implements
     private void processContactSelection(Group group, boolean isChecked) {
         if (group == null || mContacts == null) return;
 
+        updateSelectedGroupIds(mSelectedGroupIds, group.getId(), isChecked);
+
         // check/un-check contacts
         boolean hasChanged = false;
         for (Contact contact : group.getContacts()) {
@@ -846,8 +862,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
         }
 
         if (hasChanged) {
+            updateSelectContacts();
             ContactsLoaded.post(mContacts);
-            calcNrOfSelectedContacts();
+        }
+    }
+
+    private void updateSelectedGroupIds(HashSet<Long> selectIds, long contactId, boolean isChecked) {
+        if (isChecked) {
+            selectIds.add(contactId);
+        } else {
+            selectIds.remove(contactId);
         }
     }
 
@@ -855,13 +879,16 @@ public class ContactPickerActivity extends AppCompatActivity implements
      * Calculate the number or selected contacts.
      * Call this when a group has been selected/deselected or after a ContactSelectionChanged event.
      */
-    private void calcNrOfSelectedContacts() {
+    private void updateSelectContacts() {
         if (mContacts == null) return;
 
         mNrOfSelectedContacts = 0;
         for (Contact contact : mContacts) {
             if (contact.isChecked()) {
                 mNrOfSelectedContacts++;
+                mSelectedContactIds.add(contact.getId());
+            } else {
+                mSelectedContactIds.remove(contact.getId());
             }
         }
 
@@ -925,12 +952,14 @@ public class ContactPickerActivity extends AppCompatActivity implements
         TypedValue typedValue = new TypedValue();
 
         int[] resIds =  getStyleableAttributes("ContactPicker");
-        for (int resId : resIds) {
-            String resName = res.getResourceEntryName(resId);
-            boolean exists = theme.resolveAttribute(resId, typedValue, true);
-            if (! exists) {
-                themeFailure(resName);
-                return false;
+        if (resIds != null) {
+            for (int resId : resIds) {
+                String resName = res.getResourceEntryName(resId);
+                boolean exists = theme.resolveAttribute(resId, typedValue, true);
+                if (! exists) {
+                    themeFailure(resName);
+                    return false;
+                }
             }
         }
 
@@ -938,7 +967,7 @@ public class ContactPickerActivity extends AppCompatActivity implements
         return true;
     }
 
-    private int[] getStyleableAttributes(String name ) {
+    private int[] getStyleableAttributes(String name) {
         Field[] allFields = R.styleable.class.getDeclaredFields();
         for (Field field : allFields) {
             if (name.equals(field.getName())) {

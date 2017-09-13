@@ -153,7 +153,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
     }
 
     private boolean onQuery(String query) {
-        String queryString = query.toString().toLowerCase(Locale.getDefault());
+        String queryString = query.toLowerCase(Locale.getDefault());
         mQueryStrings = queryString.split(" ");
         performFiltering(mQueryStrings);
         return true;
