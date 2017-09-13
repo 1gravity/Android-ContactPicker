@@ -19,12 +19,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
     }
 }
 
 allprojects {
+    ext.support_lib_version = '26.0.2'
+    ext.event_lib_version = '3.0.0'
+    ext.fastscroll_lib_version = '0.1.3'
+
     repositories {
         jcenter()
+        google()
     }
 }
