@@ -32,6 +32,21 @@
         <item name="cp_actionIconSearch">@drawable/ic_search_black_24dp</item>
     </style>
 
+    <!-- LIGHT (Dark action bar) Theme -->
+    <style name="ContactPicker_Theme_Light_DarkActionBar" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="cp_textColorPrimary">@color/text_color_primary_light</item>
+        <item name="cp_textColorSecondary">@color/text_color_secondary_light</item>
+
+        <item name="cp_badgeLineColor">@color/contact_badge_line_light</item>
+        <item name="cp_badgeTriangleColor">@color/contact_badge_triangle_light</item>
+        <item name="cp_badgeOverlayColor">@color/contact_badge_overlay_light</item>
+
+        <item name="cp_actionIconOK">@drawable/ic_done_white_24dp</item>
+        <item name="cp_actionIconCancel">@drawable/ic_close_white_24dp</item>
+        <item name="cp_actionIconCheckAll">@drawable/ic_apps_white_24dp</item>
+        <item name="cp_actionIconSearch">@drawable/ic_search_white_24dp</item>
+    </style>
+
     <!-- DARK Theme -->
     <style name="ContactPicker_Theme_Dark" parent="@style/Theme.AppCompat">
         <item name="cp_textColorPrimary">@color/text_color_primary_dark</item>
