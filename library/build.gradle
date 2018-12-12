@@ -17,12 +17,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion 15
+        targetSdkVersion 28
     }
 
     buildTypes {
@@ -34,13 +34,19 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$support_lib_version"
-    compile "com.android.support:recyclerview-v7:$support_lib_version"
-    compile "com.android.support:design:$support_lib_version"
+    implementation "com.android.support:appcompat-v7:$support_lib_version"
 
-    compile "org.greenrobot:eventbus:$event_lib_version"
+    implementation "com.android.support:animated-vector-drawable:$support_lib_version"
+    implementation "com.android.support:support-v4:$support_lib_version"
 
-    compile "xyz.danoz:recyclerviewfastscroller:$fastscroll_lib_version"
+    implementation "com.android.support:support-annotations:$support_lib_version"
+
+    implementation "com.android.support:recyclerview-v7:$support_lib_version"
+    implementation "com.android.support:design:$support_lib_version"
+
+    implementation "org.greenrobot:eventbus:$event_lib_version"
+
+    implementation "xyz.danoz:recyclerviewfastscroller:$fastscroll_lib_version"
 }
 
 apply from: '../android-artifacts.gradle'
