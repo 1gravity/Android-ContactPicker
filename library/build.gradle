@@ -34,15 +34,15 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:$support_lib_version"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 
-    implementation "com.android.support:animated-vector-drawable:$support_lib_version"
-    implementation "com.android.support:support-v4:$support_lib_version"
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation "com.android.support:support-annotations:$support_lib_version"
+    implementation 'androidx.annotation:annotation:1.0.0'
 
-    implementation "com.android.support:recyclerview-v7:$support_lib_version"
-    implementation "com.android.support:design:$support_lib_version"
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 
     implementation "org.greenrobot:eventbus:$event_lib_version"
 
