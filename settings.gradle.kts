@@ -1,4 +1,4 @@
-rootProject.name = "sudoku-10000"
+rootProject.name = "Android-ContactPicker"
 
 plugins {
     // See https://jmfayard.github.io/refreshVersions
