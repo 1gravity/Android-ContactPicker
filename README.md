@@ -15,7 +15,7 @@ A demo app can be found here: https://play.google.com/store/apps/details?id=com.
 Add this to your Gradle build file:
 ```
 dependencies {
-    compile 'com.1gravity:android-contactpicker:1.3.2'
+    compile 'com.1gravity:android-contactpicker:1.4.0'
 }
 ```
 

@@ -31,8 +31,8 @@ android {
         applicationId = "com.onegravity.contactpicker.demo"
         minSdk = Build.minSdkVersion
         targetSdk = Build.targetSdkVersion
-        versionCode = project.get("BUILD_NUMBER", "1643908090").toInt().minus(1643908089)
-        versionName = project.get("POM_VERSION_NAME")
+        versionCode = 8
+        versionName = "1.2.1"
     }
 
     compileOptions {
@@ -69,8 +69,8 @@ android {
 
         getByName("release") {
             isDebuggable = false
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName(name)
         }
     }
@@ -78,10 +78,9 @@ android {
 
 dependencies {
     // debug builds should take the local code
-    debugImplementation(project(":library"))
-
+    implementation(project(":library"))
     // release builds should take the published artifact
-    releaseImplementation("com.1gravity:android-contactpicker:_")
+//    implementation("com.1gravity:android-contactpicker:_")
 
     implementation("com.android.support:appcompat-v7:_")
 }
