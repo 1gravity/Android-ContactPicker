@@ -18,11 +18,12 @@ package com.onegravity.contactpicker.contact;
 
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.onegravity.contactpicker.Helper;
 import com.onegravity.contactpicker.R;
