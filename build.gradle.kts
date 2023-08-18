@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,26 @@
 
 buildscript {
     repositories {
-        jcenter()
+        google()
+        mavenCentral()
+        gradlePluginPortal()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath(Android.tools.build.gradlePlugin)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
     }
 }
 
-allprojects {
-    ext.support_lib_version = '26.0.2'
-    ext.event_lib_version = '3.0.0'
-    ext.fastscroll_lib_version = '0.1.3'
+plugins {
+    id("com.github.triplet.play") apply false
+}
 
+allprojects {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
+        maven("https://jitpack.io")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }

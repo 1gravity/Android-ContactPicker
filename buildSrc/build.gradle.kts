@@ -14,30 +14,13 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.contact;
+import org.gradle.kotlin.dsl.`kotlin-dsl`
 
-public class ContactSection {
+plugins {
+    `kotlin-dsl`
+}
 
-    private final char mLetter;
-    private final int mSectionPos;
-    private final int mContactPos;
-
-    ContactSection(char letter, int sectionPos, int contactPos) {
-        mLetter = letter;
-        mSectionPos = sectionPos;
-        mContactPos = contactPos;
-    }
-
-    public char getLetter() {
-        return mLetter;
-    }
-
-    public int getSectionPos() {
-        return mSectionPos;
-    }
-
-    public int getContactPos() {
-        return mContactPos;
-    }
-
+repositories {
+    google()
+    mavenCentral()
 }

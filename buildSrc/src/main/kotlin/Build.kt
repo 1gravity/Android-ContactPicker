@@ -14,30 +14,10 @@
  * limitations under the License.
  */
 
-package com.onegravity.contactpicker.contact;
-
-public class ContactSection {
-
-    private final char mLetter;
-    private final int mSectionPos;
-    private final int mContactPos;
-
-    ContactSection(char letter, int sectionPos, int contactPos) {
-        mLetter = letter;
-        mSectionPos = sectionPos;
-        mContactPos = contactPos;
-    }
-
-    public char getLetter() {
-        return mLetter;
-    }
-
-    public int getSectionPos() {
-        return mSectionPos;
-    }
-
-    public int getContactPos() {
-        return mContactPos;
-    }
-
+object Build {
+    const val buildToolsVersion = "34.0.0"
+    const val compileSdkVersion = 34
+    const val minSdkVersion = 16
+    const val targetSdkVersion = 34
+    const val versionName = "1.4.0"
 }
