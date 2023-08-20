@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 package com.onegravity.contactpicker.contact;
 
 import android.os.Bundle;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.onegravity.contactpicker.BaseFragment;
 import com.onegravity.contactpicker.R;
@@ -90,19 +92,19 @@ public class ContactFragment extends BaseFragment {
     }
 
     @Override
-    public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public final View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAdapter = new ContactAdapter(getContext(), null, mSortOrder, mPictureType, mDescription, mDescriptionType);
 
         View rootLayout = super.createView(inflater, R.layout.cp_contact_list, mAdapter, mContacts);
 
         // configure fast scroll
-        RecyclerView recyclerView = (RecyclerView) rootLayout.findViewById(android.R.id.list);
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootLayout.findViewById(R.id.fast_scroller);
+        RecyclerView recyclerView = rootLayout.findViewById(android.R.id.list);
+        VerticalRecyclerViewFastScroller fastScroller = rootLayout.findViewById(R.id.fast_scroller);
         fastScroller.setRecyclerView(recyclerView);
         recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
         // configure section indexer
-        SectionTitleIndicator sectionTitleIndicator = (SectionTitleIndicator ) rootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
+        SectionTitleIndicator sectionTitleIndicator = rootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
         fastScroller.setSectionIndicator(sectionTitleIndicator);
 
         return rootLayout;

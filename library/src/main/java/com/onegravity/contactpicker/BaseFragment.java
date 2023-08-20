@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
@@ -41,7 +42,6 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
 
     private String[] mQueryStrings;
 
-    private View mRootLayout;
     private RecyclerView mRecyclerView;
     private View mFastScroll;
     private View mSectionIndex;
@@ -59,7 +59,7 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putSerializable("mQueryStrings", mQueryStrings);
@@ -75,8 +75,8 @@ public abstract class BaseFragment extends Fragment implements SearchView.OnQuer
     protected final View createView(LayoutInflater inflater, int layoutId,
                                     RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter,
                                     List<? extends ContactElement> elements) {
-        mRootLayout = inflater.inflate(layoutId, null);
-        mRecyclerView = (RecyclerView) mRootLayout.findViewById(android.R.id.list);
+        View mRootLayout = inflater.inflate(layoutId, null);
+        mRecyclerView = mRootLayout.findViewById(android.R.id.list);
         mFastScroll = mRootLayout.findViewById(R.id.fast_scroller);
         mSectionIndex = mRootLayout.findViewById(R.id.fast_scroller_section_title_indicator);
         mEmptyView = mRootLayout.findViewById(android.R.id.empty);

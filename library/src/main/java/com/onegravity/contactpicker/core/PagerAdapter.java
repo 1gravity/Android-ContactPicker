@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,13 +48,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return ContactFragment.newInstance(mSortOrder, mBadgeType, mDescription, mDescriptionType);
-            case 1:
-                return GroupFragment.newInstance();
-            default: return null;
-        }
+        return switch (position) {
+            case 0 -> ContactFragment.newInstance(
+                    mSortOrder, mBadgeType, mDescription, mDescriptionType
+            );
+            case 1 -> GroupFragment.newInstance();
+            default -> null;
+        };
     }
 
     @Override

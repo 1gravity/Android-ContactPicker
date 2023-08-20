@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("kapt")
     id("com.github.triplet.play")
 }
 
@@ -24,6 +23,8 @@ fun Project.get(name: String, def: String = "$name not found") =
     properties[name]?.toString() ?: System.getenv(name) ?: def
 
 android {
+    namespace = "com.onegravity.contactpicker.demo"
+
     compileSdk = Build.compileSdkVersion
     buildToolsVersion = Build.buildToolsVersion
 
@@ -31,8 +32,12 @@ android {
         applicationId = "com.onegravity.contactpicker.demo"
         minSdk = Build.minSdkVersion
         targetSdk = Build.targetSdkVersion
-        versionCode = 8
-        versionName = "1.2.1"
+
+        versionCode = project.properties["BUILD_NUMBER"]
+            ?.toString()?.toInt()?.minus(1643908089)
+            ?: 124
+
+        versionName = Build.versionName
     }
 
     compileOptions {
@@ -81,8 +86,6 @@ dependencies {
     implementation(project(":library"))
     // release builds should take the published artifact
 //    implementation("com.1gravity:android-contactpicker:_")
-
-    implementation("com.android.support:appcompat-v7:_")
 }
 
 play {

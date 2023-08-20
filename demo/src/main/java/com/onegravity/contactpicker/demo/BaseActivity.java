@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 Emanuel Moecklin
+ * Copyright (C) 2015-2023 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package com.onegravity.contactpicker.demo;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -25,20 +27,19 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends Activity {
 
     private static final String PARAM_REQUEST_IN_PROCESS = "requestPermissionsInProcess";
 
     private static final int REQUEST_PERMISSION = 3;
     private static final String PREFERENCE_PERMISSION_DENIED = "PREFERENCE_PERMISSION_DENIED";
 
-    private AtomicBoolean mRequestPermissionsInProcess = new AtomicBoolean();
+    private final AtomicBoolean mRequestPermissionsInProcess = new AtomicBoolean();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(PARAM_REQUEST_IN_PROCESS, mRequestPermissionsInProcess.get());
@@ -139,6 +140,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private void setUserDeniedPermissionAfterRationale(String permission) {
         SharedPreferences.Editor editor = getSharedPreferences(getClass().getSimpleName(), Context.MODE_PRIVATE).edit();
-        editor.putBoolean(PREFERENCE_PERMISSION_DENIED + permission, true).commit();
+        editor.putBoolean(PREFERENCE_PERMISSION_DENIED + permission, true).apply();
     }
 }

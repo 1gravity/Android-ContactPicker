@@ -1,12 +1,13 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    kotlin("kapt")
     id("maven-publish")
     id("signing")
 }
 
 android {
+    namespace = "com.onegravity.contactpicker"
+
     compileSdk = Build.compileSdkVersion
     buildToolsVersion = Build.buildToolsVersion
 
@@ -15,34 +16,26 @@ android {
         targetSdk = Build.targetSdkVersion
     }
 
-    configurations {
-        all {
-            // to prevent two lint errors:
-            // 1) commons-logging defines classes that conflict with classes now provided by Android
-            // 2) httpclient defines classes that conflict with classes now provided by Android
-            exclude("org.apache.httpcomponents", "httpclient")
-        }
-    }
-
     lint {
         abortOnError = true
         disable += "UnusedResources"
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
     implementation("com.android.support:appcompat-v7:_")
-    implementation("com.android.support:recyclerview-v7:_")
     implementation("com.android.support:design:_")
 
     implementation("org.greenrobot:eventbus:_")
 
-    implementation("xyz.danoz:recyclerviewfastscroller:_")
+    implementation("xyz.danoz:recyclerviewfastscroller:_") {
+        exclude(group = "com.android.support", module = "support-v4")
+    }
 }
 
 tasks {
@@ -98,7 +91,7 @@ tasks {
 
 afterEvaluate {
     fun Project.get(name: String, def: String = "$name not found") =
-            properties[name]?.toString() ?: System.getenv(name) ?: def
+        properties[name]?.toString() ?: System.getenv(name) ?: def
 
     fun Project.getRepositoryUrl(): java.net.URI {
         val isReleaseBuild = !get("POM_VERSION_NAME").contains("SNAPSHOT")
@@ -125,8 +118,11 @@ afterEvaluate {
             val publicationName = project.get("POM_NAME", "publication")
             create<MavenPublication>(publicationName) {
                 from(project.components["release"])
+
                 artifact(tasks.named<Jar>("withJavadocJar"))
-                artifact(tasks.named<Jar>("withSourcesJar"))
+                tasks.named("generateMetadataFileFor${rootProject.name}Publication") {
+                    dependsOn("withSourcesJar")
+                }
 
                 pom {
                     groupId = project.get("POM_GROUP_ID")
