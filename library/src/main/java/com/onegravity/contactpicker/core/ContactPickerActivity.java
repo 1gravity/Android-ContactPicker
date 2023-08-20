@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Emanuel Moecklin
+ * Copyright (C) 2015-2022 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
 import com.onegravity.contactpicker.OnContactCheckedListener;
 import com.onegravity.contactpicker.R;
 import com.onegravity.contactpicker.contact.Contact;
@@ -65,6 +60,12 @@ import java.util.List;
 import java.util.Map;
 
 import static android.provider.ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.viewpager.widget.ViewPager;
 
 public class ContactPickerActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {

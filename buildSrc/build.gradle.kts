@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Emanuel Moecklin
+ * Copyright (C) 2015-2022 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-    }
+import org.gradle.kotlin.dsl.`kotlin-dsl`
+
+plugins {
+    `kotlin-dsl`
 }
 
-allprojects {
-    ext.support_lib_version = '26.0.2'
-    ext.event_lib_version = '3.0.0'
-    ext.fastscroll_lib_version = '0.1.3'
-
-    repositories {
-        jcenter()
-        google()
-    }
+repositories {
+    google()
+    mavenCentral()
 }

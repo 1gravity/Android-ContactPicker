@@ -8,19 +8,18 @@ A demo app can be found here: https://play.google.com/store/apps/details?id=com.
 ![Contact picker light theme](art/contact_list_light_framed_small.png?raw=true "Contact picker light theme")
 ![Contact picker dark theme](art/groups_list_dark_framed_small.png?raw=true "Contact picker dark theme")
 
-Setup
------
+# Setup
 
-####**Dependencies**
+## Dependencies
 
 Add this to your Gradle build file:
 ```
 dependencies {
-    compile 'com.1gravity:android-contactpicker:1.3.2'
+    compile 'com.1gravity:android-contactpicker:1.4.0'
 }
 ```
 
-####**Manifest**
+## Manifest
 
 Define the contact picker Activity and the READ_CONTACTS permission in the manifest:
 ```
@@ -41,7 +40,7 @@ Define the contact picker Activity and the READ_CONTACTS permission in the manif
 Note: if your app targets Android 6 and higher (API level 23 and above), you also need to request the contacts permission at run-time.
 Check out the demo app for an example how this can be done.
  
-####**Usage**
+## Usage
 
 Call the contact picker like this (see Javadoc for a description of the individual parameters):
 ```
@@ -81,7 +80,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 The source code includes a more comprehensive example.<br>Also check out the demo app on Google Play: https://play.google.com/store/apps/details?id=com.onegravity.contactpicker.demo.
 
-####**Intent Extra Parameters**
+## Intent Extra Parameters
 
 As seen above in the example, these parameters are chained to the intent where each param descriptor is attached to `ContactPickerActivity`. 
 Below is a listing of the parameters and their purpose:
@@ -93,7 +92,7 @@ Below is a listing of the parameters and their purpose:
 |  **EXTRA_SHOW_CHECK_ALL** (Boolean)  |  This parameter decides whether to show/hide the check_all button in the menu. When `EXTRA_SELECT_CONTACTS_LIMIT` > 0, this will be forced to `false`.  <br/> Default: `true` |
 |  **EXTRA_ONLY_CONTACTS_WITH_PHONE** (Boolean)  |  This parameter sets the boolean that filters contacts that have no phone numbers <br/> Default: `false` |
 
-####**Theming**
+## Theming
 
 The library supports a dark and a light theme out-of-the-box. In order to do that, it defines a
 couple of custom attributes in attrs.xml.
@@ -101,7 +100,7 @@ To integrate the contact picker in your app, you need to either extend one of th
 themes (ContactPicker_Theme_Light / ContactPicker_Theme_Dark) or define the custom attributes in
 your own theme.
 
-#### **Proguard**
+## Proguard
 
 If you use Proguard, please add the following lines to your configuration file:
 ```
@@ -119,8 +118,7 @@ If you use Proguard, please add the following lines to your configuration file:
 }
 ```
 
-Issues
-------
+# Issues
 
 If you have an issues with this library, please open a issue here: https://github.com/1gravity/Android-ContactPicker/issues and provide enough information to reproduce it reliably. The following information needs to be provided:
 
@@ -134,10 +132,9 @@ If you have an issues with this library, please open a issue here: https://githu
 * Optional: Link to any screenshot(s) that demonstrate the issue (shared privately in Drive.)
 * Optional: Link to your APK (either downloadable in Drive or in the Play Store.)
 
-License
--------
+# License
 
-Copyright 2016 Emanuel Moecklin
+Copyright 2022 Emanuel Moecklin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

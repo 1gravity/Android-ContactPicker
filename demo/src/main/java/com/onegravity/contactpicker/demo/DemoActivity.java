@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Emanuel Moecklin
+ * Copyright (C) 2015-2022 Emanuel Moecklin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -38,6 +37,7 @@ import com.onegravity.contactpicker.picture.ContactPictureType;
 import java.io.Serializable;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class DemoActivity extends BaseActivity {
 
     private static final String EXTRA_DARK_THEME = "EXTRA_DARK_THEME";
@@ -50,6 +50,7 @@ public class DemoActivity extends BaseActivity {
     private List<Contact> mContacts;
     private List<Group> mGroups;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,31 +76,28 @@ public class DemoActivity extends BaseActivity {
         // configure "pick contact(s)" button
         ImageButton button = (ImageButton) findViewById(R.id.pick_contact);
         if (button != null) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
-                            .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ?
-                                    R.style.Theme_Dark : R.style.Theme_Light)
+            button.setOnClickListener(v -> {
+                Intent intent = new Intent(DemoActivity.this, ContactPickerActivity.class)
+                        .putExtra(ContactPickerActivity.EXTRA_THEME, mDarkTheme ?
+                                R.style.Theme_Dark : R.style.Theme_Light)
 
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
-                                      ContactPictureType.ROUND.name())
+                        .putExtra(ContactPickerActivity.EXTRA_CONTACT_BADGE_TYPE,
+                                  ContactPictureType.ROUND.name())
 
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION,
-                                      ContactDescription.ADDRESS.name())
-                            .putExtra(ContactPickerActivity.EXTRA_SHOW_CHECK_ALL, true)
-                            .putExtra(ContactPickerActivity.EXTRA_SELECT_CONTACTS_LIMIT, 0)
-                            .putExtra(ContactPickerActivity.EXTRA_ONLY_CONTACTS_WITH_PHONE, false)
-                            .putExtra(ContactPickerActivity.EXTRA_WITH_GROUP_TAB, false)
+                        .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION,
+                                  ContactDescription.ADDRESS.name())
+                        .putExtra(ContactPickerActivity.EXTRA_SHOW_CHECK_ALL, true)
+                        .putExtra(ContactPickerActivity.EXTRA_SELECT_CONTACTS_LIMIT, 0)
+                        .putExtra(ContactPickerActivity.EXTRA_ONLY_CONTACTS_WITH_PHONE, false)
+                        .putExtra(ContactPickerActivity.EXTRA_WITH_GROUP_TAB, false)
 
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,
-                                      ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                        .putExtra(ContactPickerActivity.EXTRA_CONTACT_DESCRIPTION_TYPE,
+                                  ContactsContract.CommonDataKinds.Email.TYPE_WORK)
 
-                            .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER,
-                                      ContactSortOrder.AUTOMATIC.name());
+                        .putExtra(ContactPickerActivity.EXTRA_CONTACT_SORT_ORDER,
+                                  ContactSortOrder.AUTOMATIC.name());
 
-                    startActivityForResult(intent, REQUEST_CONTACT);
-                }
+                startActivityForResult(intent, REQUEST_CONTACT);
             });
         }
         else {
