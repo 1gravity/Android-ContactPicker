@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2015-2023 Emanuel Moecklin
+  Copyright (C) 2015-2017 Emanuel Moecklin
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
   limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.onegravity.contactpicker.demo">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
@@ -26,8 +27,7 @@
         android:theme="@style/Theme_Dark">
 
         <activity
-            android:name=".DemoActivity"
-            android:exported="true">
+            android:name=".DemoActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
